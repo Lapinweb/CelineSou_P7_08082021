@@ -7,6 +7,7 @@ const sequelize = new Sequelize(process.env.DB_DATABASE, process.env.DB_USER, pr
   dialect: 'mysql'
 });
 
+
 try {
   sequelize.authenticate();
   console.log('Connexion à MySQL réussie.');

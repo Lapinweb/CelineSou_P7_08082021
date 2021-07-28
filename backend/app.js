@@ -3,6 +3,9 @@ const sequelize = require('./database');
 
 const app = express();
 
+const userRoutes = require('./routes/user');
+const postRoutes = require('./routes/post');
+
 const User = require('./models/user');
 const Post = require('./models/post');
 const Comment = require('./models/comment');
@@ -11,13 +14,7 @@ User.hasMany(Post);
 User.hasMany(Comment);
 Post.hasMany(Comment);
 
-sequelize.sync()
-.then((res) => {
-    console.log(res);
-})
-.catch((err) => {
-    console.log(err);
-});
+sequelize.sync();
 
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -25,5 +22,8 @@ app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
     next();
 });
+
+app.use('/api/auth', userRoutes);
+app.use('api/posts/', postRoutes);
 
 module.exports = app;

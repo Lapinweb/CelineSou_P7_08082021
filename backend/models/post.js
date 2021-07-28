@@ -8,13 +8,17 @@ const Post = sequelize.define('post', {
         allowNull : false,
         primaryKey : true        
     },
+    userId : {
+        type : Sequelize.INTEGER,
+        allowNull : false
+    },
     content : {
         type : Sequelize.TEXT,
         allowNull : false
     },
     imageUrl : {
         type : Sequelize.STRING,
-    }
+    },
 });
 
 module.exports = Post;

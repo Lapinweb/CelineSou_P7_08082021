@@ -1,5 +1,6 @@
 const Post = require('../models/post');
 const Comment = require('../models/comment');
+const User = require('../models/user');
 
 const fs = require('fs');
 
@@ -12,15 +13,21 @@ exports.getAllPosts = (req, res, next) => {
 exports.getOnePost = (req, res, next) => {
     Post.findOne({ where: { id: req.params.id } })
         .then(post => res.status(200).json(post))
-        .catch(error => res.status(400).json({ error }));
+        .catch(error => res.status(404).json({ error }));
 };
 
 exports.createPost = (req, res, next) => {
     const postObject = req.file ?
     {
-        ...JSON.parse(req.body.post),
+        userId: req.user.id,
+        content: JSON.parse(req.body.content),
         imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
-    } : { ...req.body.post };
+    } : {
+        userId: req.user.id,
+        content: req.body.content
+    };
+
+    console.log('postObject: ', postObject);
 
     Post.create(postObject)
     .then(() => res.status(201).json({ message: 'Post créé !'}))
@@ -28,54 +35,83 @@ exports.createPost = (req, res, next) => {
 };
 
 exports.modifyPost = (req, res, next) => {
-    //vérifie si le post a une image ajouté ou modifié
-    const postObject = req.file ?   
-    (
-        //si oui, supprime l'image...
-        Post.findOne({ where: { id: req.params.id } })
+    console.log('req.file: ', req.file);
+    console.log("req.hasOwnProperty.('file'):" , req.hasOwnProperty('file'));
+
+    //cherche le post correspondant à l'id en paramètre
+    Post.findOne({ where: {id: req.params.id} })
         .then(post => {
-            if (post.imageUrl) {
-                const filename = post.imageUrl.split('/images/')[1];
-                fs.unlink(`images/${filename}`, () => {
-                    Post.destroy({ where: { id: req.params.id }} )
-                    .then(() => res.status(200).json({ message: 'Post supprimé !' }))
-                    .catch(error => res.status(400).json({ error }));
-                });
+            //vérifie si l'id dans le token correspond à l'id du créateur du post ou si le user est administrateur
+            if ( post.userId != req.user.id && req.user.isAdmin == false) {  //si non
+                if (req.hasOwnProperty('file')) {  //supprime l'image enregistrée par multer si elle existe
+                    fs.unlink(`images/${req.file.filename}`, () => {
+                        return res.status(403).json({ error: 'Seul le créateur peut modifier ce poste !'})
+                    });
+                }
+            } else {  //si oui
+                const postObject = getPostObject();
+
+                //vérifie si le post a une image ajouté ou modifié
+                function getPostObject() {
+                    //si oui...
+                    if (req.hasOwnProperty('file')) {
+                        //supprime l'image existante si il y en a une
+                        if (post.imageUrl !== null) {
+                            const filename = post.imageUrl.split('/images/')[1];
+                            fs.unlink(`images/${filename}`, () => {
+                                Post.destroy({ where: { id: req.params.id }} )
+                                .then(() => res.status(200).json({ message: 'Post supprimé !' }))
+                                .catch(error => res.status(400).json({ error }));
+                            });
+                        }
+                        //renvoie le corps de la requête avec un nouveau imageUrl
+                        return {
+                        content: JSON.parse(req.body.content),
+                        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+                        }
+                    } else { //si non, renvoie le corps de la requête
+                        return {...req.body};
+                    }
+                }
+
+                console.log(postObject);
+            
+                Post.update(postObject, { where: { id: req.params.id } })
+                .then(() => res.status(200).json({ message: 'Post modifié !' }))
+                .catch(error => res.status(400).json({ error }));
             }
         })
-        .catch(error => res.status(500).json({ error })),
-
-        //...et renvoie le corps de la requête avec un nouveau imageUrl
-        {
-        ...JSON.parse(req.body.post),
-        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
-        }
-    ): {...req.body.post}; //si non, renvoie le corps de la requête
-
-    console.log(postObject);
-    
-    Post.update(postObject, { where: { id: req.params.id } })
-        .then(() => res.status(200).json({ message: 'Post modifié !' }))
-        .catch(error => res.status(400).json({ error }));
+        .catch(error => res.status(404).json({ error }));
 };
 
 exports.deletePost = (req, res, next) => {
+    //cherche le post correspondant à l'id en paramètre
     Post.findOne({ where: { id: req.params.id } })
         .then(post => {
-            if (post.imageUrl) {
+            //vérifie si l'id dans le token correspond à l'id du créateur du post ou si le user est administrateur
+            if (post.userId !== req.user.id && req.user.isAdmin == false) {
+                return res.status(403).json({ error: 'Seul le créateur peut supprimer ce poste !'});
+            }
+
+            //supprime les commentaires du post
+            Comment.destroy({ where: {postId: req.params.id} });
+
+            console.log('post.imageUrl: ', post.imageUrl);
+            //supprime l'image du post si elle existe puis supprime le post
+            if (post.imageUrl !== null) {
                 const filename = post.imageUrl.split('/images/')[1];
                 fs.unlink(`images/${filename}`, () => {
                     Post.destroy({ where: { id: req.params.id }} )
                     .then(() => res.status(200).json({ message: 'Post supprimé !' }))
                     .catch(error => res.status(400).json({ error }));
                 });
-            } else {
+            } else {  //ou supprime le post directement
                 Post.destroy({ where: { id: req.params.id }} )
                 .then(() => res.status(200).json({ message: 'Post supprimé !' }))
                 .catch(error => res.status(400).json({ error }));                
             }
         })
-        .catch(error => res.status(500).json({ error }));
+        .catch(error => res.status(404).json({ error }));
 };
 
 exports.getAllComments = (req, res, next) => {
@@ -86,10 +122,10 @@ exports.getAllComments = (req, res, next) => {
 
 exports.createComment = (req, res, next) => {
     Comment.create({
-        userId: req.body.userId,
+        userId: req.user.id,
         postId: req.params.id,
         content: req.body.content
     })
     .then(() => res.status(201).json({ message: 'Commentaire créé !' }))
-    .catch(error => res.status(400).json({ error }));
+    .catch(error => res.status(404).json({ error }));
 };

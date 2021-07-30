@@ -23,11 +23,21 @@ const User = sequelize.define('user', {
     },
     firstName : {
         type : Sequelize.STRING,
-        allowNull : false
+        allowNull : false,
+        validate: {
+            isAlpha: {
+                args: ['fr-FR', {ignore: ' -'}]
+            }
+        }
     },
     lastName : {
         type : Sequelize.STRING,
-        allowNull : false
+        allowNull : false,
+        validate: {
+            isAlpha: {
+                args: ['fr-FR', {ignore: ' -'}]
+            }
+        }
     }
 });
 

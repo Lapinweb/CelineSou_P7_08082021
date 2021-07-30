@@ -4,8 +4,18 @@ const User = require('../models/user');
 const bcrypt = require('bcrypt');
 const cryptoJS = require('crypto-js');
 const jwt = require('jsonwebtoken');
+const validator = require('validator');
 
 exports.signup = (req, res, next) => {
+    //validation de l'email et du mot de passe
+    if (!validator.isEmail(req.body.email)) {
+        return res.status(400).json({ error: "L'e-mail est invalide !" })
+    }
+
+    if (!validator.isStrongPassword(req.body.password)) {
+        return res.status(400).json({ error: 'Le mot de passe doit faire au moins 8 lettres, avoir une minuscule, une majuscule, un chiffre et un symbole !' })
+    }    
+
     //hashe le mot de passe
     bcrypt.hash(req.body.password, 10)
         .then(hash => {

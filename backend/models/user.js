@@ -1,3 +1,8 @@
+require('dotenv').config();
+
+const bcrypt = require('bcrypt');
+const cryptoJS = require('crypto-js');
+
 const Sequelize = require('sequelize');
 const sequelize = require('../database');
 
@@ -11,11 +16,23 @@ const User = sequelize.define('user', {
     email : {
         type : Sequelize.STRING,
         allowNull : false,
-        unique : true
+        unique : true,
+        validate: {
+            isEmail: {
+            msg: "L'email est invalide !",
+            logging: console.log
+            }
+        }
     },
     password : {
         type : Sequelize.STRING,
-        allowNull : false
+        allowNull : false,
+        validate: {
+            isStrongPassword: {
+                msg: 'Le mot de passe doit faire au moins 8 lettres, avoir une majuscule, une minuscule, un chiffre et un symbole !',
+                logging: console.log
+            }
+        }
     },
     isAdmin : {
         type : Sequelize.BOOLEAN,
@@ -37,6 +54,23 @@ const User = sequelize.define('user', {
             isAlpha: {
                 args: ['fr-FR', {ignore: ' -'}]
             }
+        }
+    },
+    imageUrl : {
+        type: Sequelize.STRING,
+    }
+},{
+    updatedAt: false,
+    hooks: {
+        beforeCreate: async (user) => {
+            user.password = await bcrypt.hash(user.password, 10);
+
+            const key = cryptoJS.enc.Hex.parse(process.env.CRYPTO_KEY);
+            const iv = cryptoJS.enc.Hex.parse(process.env.CRYPTO_IV);
+            user.email = cryptoJS.AES.encrypt(user.email, key, {iv: iv}).toString();
+            user.firstName = cryptoJS.AES.encrypt(user.firstName, key, {iv: iv}).toString();
+            user.lastName = cryptoJS.AES.encrypt(user.lastName, key, {iv: iv}).toString();
+            return user;
         }
     }
 });

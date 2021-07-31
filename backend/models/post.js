@@ -18,7 +18,7 @@ const Post = sequelize.define('post', {
     },
     imageUrl : {
         type : Sequelize.STRING,
-    },
+    }
 });
 
 module.exports = Post;

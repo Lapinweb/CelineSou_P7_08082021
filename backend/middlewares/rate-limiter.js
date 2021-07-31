@@ -1,9 +1,11 @@
+require('dotenv').config();
+
 const sequelize = require('../database');
 const { RateLimiterMySQL } = require('rate-limiter-flexible');
 
 const consecutiveRateLimiter = new RateLimiterMySQL({
     storeClient: sequelize,
-    dbName: 'groupomania',
+    dbName: process.env.DB_DATABASE,
     tableName: 'consecutive_login',
     points: 5,
     duration: 60 * 60, //en secondes, la limite est actualisé après 1h
@@ -12,7 +14,7 @@ const consecutiveRateLimiter = new RateLimiterMySQL({
 
 const slowRateLimiter = new RateLimiterMySQL({
     storeClient: sequelize,
-    dbName: 'groupomania',
+    dbName: process.env.DB_DATABASE,
     tableName: 'slow_login',
     points: 50,
     duration: 60 * 60 * 24, //en secondes, la limite est actualisé après 24h
@@ -20,7 +22,6 @@ const slowRateLimiter = new RateLimiterMySQL({
 });
 
 const rateLimiter = (req, res, next) => {
-    console.log('hello');
     const username = req.body.email;
     const ip = req.ip;
     slowRateLimiter.consume(`${username}_${ip}`) //soustrait 1 point

@@ -3,7 +3,7 @@ const User = require('../models/user');
 
 exports.modifyComment = (req, res, next) => {
     //cherche le commentaire qui correspond à l'id en paramètre
-    Comment.findOne({ where: { id: req.params.id } })
+    Comment.findByPk(req.params.id)
         .then(comment => {
             //vérifie si l'id dans le token correspond à l'id du créateur ou si le user est administrateur
             if ( comment.userId != req.user.id && req.user.isAdmin == false) { //si non, retourne une erreur
@@ -19,7 +19,7 @@ exports.modifyComment = (req, res, next) => {
 
 exports.deleteComment = (req, res, next) => {
     //cherche le commentaire qui correspond à l'id en paramètre
-    Comment.findOne({ where: { id: req.params.id }})
+    Comment.findByPk(req.params.id)
         .then(comment => {
             //vérifie si l'id dans le token correspond à l'id du créateur ou si le user est administrateur
             if (comment.userId != req.user.id && req.user.isAdmin == false) {

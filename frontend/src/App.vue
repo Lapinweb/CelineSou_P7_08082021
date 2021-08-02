@@ -1,30 +1,36 @@
 <template>
-  <header>
-      <nav class="nav">
-        <router-link to="/">Home</router-link> |
-        <router-link to="/about">About</router-link>
-      </nav>
-  </header>
+  <Header/>
 
-  <main>
-    <router-view/>
+  <main class="container my-4 pb-5">
+    <div class="row">
+      <div class="col-12">
+        <router-view></router-view>
+      </div>
+    </div>
   </main>
 
-  <footer>
-
-  </footer>
+  <Footer/>
 </template>
 
+<script>
+import Header from "./components/Header"
+import Footer from "./components/Footer"
+
+export default {
+  name: "App",
+  components: {
+    Header,
+    Footer
+    }
+}
+
+</script>
+
+
 <style lang="scss">
-body {
-  margin: 0;
-}
-
 #app {
-  margin: 0;
-  padding: 0;
-  width: 100vw;
-  height: 100vh;
+  min-height: 100vh;
+  background: url('./assets/images/icon.png') center fixed no-repeat;
+  background-size: cover;
 }
-
 </style>

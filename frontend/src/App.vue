@@ -33,8 +33,8 @@
     </div>
   </main>
 
-    <footer class="container-fluid fixed-bottom bg-primary py-4">
-    </footer>
+  <footer class="container-fluid fixed-bottom bg-primary py-4">
+  </footer>
 </template>
 
 <script>
@@ -47,6 +47,7 @@ export default {
   },
   methods: {
     logOut: function() {
+      sessionStorage.clear;
       this.$store.commit('logout');
       this.$router.push('/login');
     }

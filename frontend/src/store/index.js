@@ -2,28 +2,24 @@ import { createStore } from 'vuex'
 
 const store = createStore({
   state: {
-    isAuth: false,
-    token: "",
-    user: {}
+    token: sessionStorage.getItem("token") || "",
+    user: sessionStorage.getItem("user") || {}
   },
   getters: {
     isLoggedIn: (state) =>  {
-      return state.isAuth
+      return !!state.token
     }
   },
   mutations: {
     auth_success (state, token, user) {
-      state.isAuth = true
       state.token = token
       state.user = user
     },
     auth_error (state) {
-      state.isAuth = false
       state.token = ""
       state.user = {}
     },
     logout (state) {
-      state.isAuth = false
       state.token = ""
       state.user = {}
     }
@@ -49,15 +45,19 @@ const store = createStore({
           const user = {
             id: res.userId,
             isAdmin: res.isAdmin
-          }
+          };
+
+          sessionStorage.setItem("token", token);
+          sessionStorage.setItem("user", user);
+
           commit('auth_success', token, user);
           resolve(res)
         })
         .catch(error => {
+          commit('auth_error');
           reject(error);
         })        
       })
-
     }
   },
   modules: {

@@ -1,10 +1,13 @@
+require('dotenv').config();
+
 const Post = require('../models/post');
 const Comment = require('../models/comment');
+const User = require('../models/user');
 
 const fs = require('fs');
 
 exports.getAllPosts = (req, res, next) => {
-    Post.findAll()
+    Post.findAll({ include: User })
         .then(posts => res.status(200).json(posts))
         .catch(error => res.status(400).json({ error }));
 };

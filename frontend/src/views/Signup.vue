@@ -6,7 +6,7 @@
           <h1 class="text-secondary">Créer un compte</h1>
         </div>        
       </div>
-      
+
       <form class="row mt-3">
         <div class="col-12 col-md-6 mb-3">
           <label for="email" class="form-label">
@@ -69,7 +69,7 @@
 
         <div class="row my-3">
           <div class="col-12">
-            <button type="submit" class="btn btn-secondary text-white" @click.prevent="submitSignup" :disabled="disableButton">Envoyer</button> 
+            <button type="submit" class="btn btn-secondary text-white" @click.prevent="signUp" :disabled="disableButton">Envoyer</button> 
           </div>          
         </div>
 
@@ -184,15 +184,19 @@ export default {
     }
   },
   methods: {
-    submitSignup: function() {
-
+    signUp: function() {
       fetch("http://localhost:3000/api/user/signup", {
         method: "POST",
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({email: this.email, password: this.password, firstName: this.firstName, lastName: this.lastName})
+        body: JSON.stringify({
+          email: this.email,
+          password: this.password,
+          firstName: this.firstName,
+          lastName: this.lastName
+        })
       })
       .then(res => {
         if (res.ok) {
@@ -201,10 +205,23 @@ export default {
       })
       .then(res => {
         console.log(res);
+        this.$store.dispatch('signIn', {
+          email: this.email,
+          password: this.password
+        })
+        .then(() => {
+          this.$router.push('posts')
+        })
+        .catch(error => {
+          console.log(error)
+          alert("Le compte a été créé mais la connexion à celle-ci a échouée!")
+        })
       })
-      .catch(error => console.log(error))
+      .catch(error => {
+        console.log(error);
+        alert("La création d'un nouveau compte a échouée !")
+      })
     }
-
   }
 }
 </script>

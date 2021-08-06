@@ -83,12 +83,10 @@ exports.deleteAccount = (req, res, next) => {
 exports.getUser = (req, res, next) => {
     User.findByPk(req.params.id)
         .then(user => {
-            ///définie les paramètres pour le décryptage des donées utilisateurs
+            //définie les paramètres pour le décryptage des données utilisateurs
             const key = cryptoJS.enc.Hex.parse(process.env.CRYPTO_KEY);
             const iv = cryptoJS.enc.Hex.parse(process.env.CRYPTO_IV);
             const email = cryptoJS.AES.decrypt(user.email, key, {iv: iv}).toString(cryptoJS.enc.Utf8);
-            const firstName = cryptoJS.AES.decrypt(user.firstName, key, {iv: iv}).toString(cryptoJS.enc.Utf8);
-            const lastName = cryptoJS.AES.decrypt(user.lastName, key, {iv: iv}).toString(cryptoJS.enc.Utf8);
 
             //masque l'email
             const emailMask2Options = {
@@ -99,7 +97,7 @@ exports.getUser = (req, res, next) => {
             };
             const maskedEmail = MaskData.maskEmail2(email, emailMask2Options);
             
-            res.status(200).json({email: maskedEmail, firstName, lastName, imageUrl: user.imageUrl})
+            res.status(200).json({email: maskedEmail, firstName: user.firstName, lastName: user.lastName, imageUrl: user.imageUrl})
         })
         .catch(error => res.status(400).json({ error }));
 };

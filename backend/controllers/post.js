@@ -1,10 +1,15 @@
+require('dotenv').config();
+
 const Post = require('../models/post');
 const Comment = require('../models/comment');
+const User = require('../models/user');
 
 const fs = require('fs');
 
 exports.getAllPosts = (req, res, next) => {
-    Post.findAll()
+    Post.findAll({
+        include: {model: User, attributes: ['firstName', 'lastName']},
+        order: [['createdAt', 'DESC']] })
         .then(posts => res.status(200).json(posts))
         .catch(error => res.status(400).json({ error }));
 };
@@ -17,7 +22,9 @@ exports.getPagePosts = (req, res, next) => {
 }
 
 exports.getOnePost = (req, res, next) => {
-    Post.findByPk(req.params.id)
+    Post.findOne({
+        where: { id: req.params.id },
+        include: {model: User, attributes: ['firstName', 'lastName']} })
         .then(post => res.status(200).json(post))
         .catch(error => res.status(404).json({ error }));
 };

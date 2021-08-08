@@ -68,8 +68,6 @@ const User = sequelize.define('user', {
             const key = cryptoJS.enc.Hex.parse(process.env.CRYPTO_KEY);
             const iv = cryptoJS.enc.Hex.parse(process.env.CRYPTO_IV);
             user.email = cryptoJS.AES.encrypt(user.email, key, {iv: iv}).toString();
-            user.firstName = cryptoJS.AES.encrypt(user.firstName, key, {iv: iv}).toString();
-            user.lastName = cryptoJS.AES.encrypt(user.lastName, key, {iv: iv}).toString();
             return user;
         }
     }

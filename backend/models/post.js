@@ -1,5 +1,6 @@
 const Sequelize = require('sequelize');
 const sequelize = require('../database');
+const User = require('./user');
 
 const Post = sequelize.define('post', {
     id : {
@@ -20,5 +21,7 @@ const Post = sequelize.define('post', {
         type : Sequelize.STRING,
     }
 });
+
+Post.belongsTo(User)
 
 module.exports = Post;

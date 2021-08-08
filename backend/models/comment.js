@@ -1,5 +1,7 @@
 const Sequelize = require('sequelize');
 const sequelize = require('../database');
+const Post = require('./post');
+const User = require('./user');
 
 const Comment = sequelize.define('comment', {
     id : {
@@ -21,5 +23,8 @@ const Comment = sequelize.define('comment', {
         allowNull : false
     }    
 });
+
+Comment.belongsTo(User);
+Comment.belongsTo(Post);
 
 module.exports = Comment;

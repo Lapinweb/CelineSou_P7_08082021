@@ -16,7 +16,7 @@
         </div>
     </div>
 
-    <div v-for="post in posts" :key="post.id" class="row mb-5">
+    <div v-for="(post, index) in posts" :key="index" class="row mb-5">
         <Post
             :fullName="fullName(post.user.firstName, post.user.lastName)"
             :content="post.content"

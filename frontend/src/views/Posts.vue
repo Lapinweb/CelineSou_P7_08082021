@@ -1,7 +1,7 @@
 <template>
     <div class="row py-3 mb-5 d-flex justify-content-between align-items-center">
         <div class="col-12 col-sm-6">
-            <button class="btn btn-secondary" @click="reverseOrder()">
+            <button class="btn btn-info text-white" @click="reverseOrder()">
                 Trier par :
                 <span v-if="chronologicalOrder == false">les plus récents</span>
                 <span v-else>les plus anciens</span>
@@ -9,24 +9,27 @@
         </div>
 
         <div class="col-12 col-sm-6 text-end mt-2 mt-sm-0">
-            <router-link to="/newpost" class="btn btn-secondary">
+            <router-link to="/newpost" class="btn btn-info text-white">
                 Créer un nouveau post
                 <i class="fas fa-pen"></i>
             </router-link>
         </div>
     </div>
 
-    <div v-for="(post, index) in posts" :key="index" class="row mb-5">
-        <Post
-            :fullName="fullName(post.user.firstName, post.user.lastName)"
-            :content="post.content"
-            :date="formatedDate(post.createdAt)"
-            :imageUrl="post.imageUrl"
-            :postId="post.id"
-            :postUserId="post.userId"
-            :userId="currentUserId"
-        ></Post>
+    <div v-if="posts">
+        <div v-for="(post, index) in posts" :key="index" class="row mb-5">
+            <Post
+                :fullName="fullName(post.user.firstName, post.user.lastName)"
+                :content="post.content"
+                :date="formatedDate(post.createdAt)"
+                :imageUrl="post.imageUrl"
+                :postId="post.id"
+                :postUserId="post.userId"
+                :userId="currentUserId"
+            ></Post>
+        </div>        
     </div>
+
 
 </template>
 
@@ -46,8 +49,7 @@ export default {
     },
     computed: {
         currentUserId: function() {
-            const id = sessionStorage.getItem("userId");
-            return parseInt(id);
+            return this.$store.getters.currentUserId
         }
     },
     methods: {

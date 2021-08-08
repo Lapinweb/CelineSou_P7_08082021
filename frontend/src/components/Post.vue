@@ -38,7 +38,7 @@
                     </div>
 
                     <div class="col-5 text-end">
-                        <router-link :to="{name: 'SinglePost', params: {id: postId}}"  class="btn btn-outline-secondary border border-light text-white fs-5">
+                        <router-link :to="{name: 'SinglePost', params: {id: postId}}" class="btn btn-outline-secondary border border-light text-white fs-5">
                             <i class="fas fa-comments"></i>
                         </router-link>                            
                     </div>

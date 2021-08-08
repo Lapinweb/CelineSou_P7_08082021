@@ -15,10 +15,10 @@ const store = createStore({
     }
   },
   mutations: {
-    auth_success (state, token, userId, isAdmin) {
-      state.token = token;
-      state.userId = userId;
-      state.isAdmin = isAdmin;
+    auth_success (state) {
+      state.token = sessionStorage.getItem("token");
+      state.userId = sessionStorage.getItem("userId");
+      state.isAdmin = sessionStorage.getItem("isAdmin");
     },
     auth_error (state) {
       state.token = "";
@@ -56,11 +56,7 @@ const store = createStore({
           sessionStorage.setItem("userId", userId);
           sessionStorage.setItem("isAdmin", isAdmin);
 
-          return {token, userId, isAdmin}
-
-        })
-        .then((res) => {
-          commit('auth_success', res.token, res.userId, res.isAdmin);
+          commit('auth_success');
           resolve(res);
         })
         .catch(error => {

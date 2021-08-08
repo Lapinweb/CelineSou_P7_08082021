@@ -36,12 +36,16 @@
 <script>
 export default {
   name: "App",
+  data() {
+    return {
+    }
+  },
   computed: {
     isLoggedIn: function() {
-      return this.$store.getters.isLoggedIn
+      return this.$store.getters.isLoggedIn;
     },
     userId: function() {
-      return this.$store.state.userId
+      return this.$store.getters.currentUserId
     }
   },
   methods: {

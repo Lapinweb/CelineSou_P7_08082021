@@ -14,10 +14,10 @@
     <div class="row">
         <form>
             <div class="col-12 col-md-9">
-                <textarea class="form-control border border-secondary textarea-height" placeholder="Ajouter un commentaire"></textarea>
+                <textarea class="form-control border border-secondary textarea-height shadow" placeholder="Ajouter un commentaire"></textarea>
             </div>
             <div class="col-12 col-md-9 mt-2 mb-3 text-end">
-                <button class="btn btn-secondary text-white">Envoyer</button>
+                <button class="btn btn-info text-white shadow">Envoyer</button>
             </div>
 
         </form>
@@ -58,8 +58,7 @@ export default {
     },
     computed: {
         currentUserId: function() {
-            const id = sessionStorage.getItem("userId");
-            return parseInt(id);
+            return this.$store.getters.currentUserId
         }
     },
     methods: {

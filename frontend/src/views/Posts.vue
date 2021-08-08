@@ -1,24 +1,33 @@
 <template>
-    <div class="container">
-        <div class="row bg-secondary mb-4 rounded-3">
-            <div class="col-12 text-white">
-                <p class="my-2 fs-5">Trier par</p>
-            </div>
+    <div class="row py-3 mb-5 d-flex justify-content-between align-items-center">
+        <div class="col-12 col-sm-6">
+            <button class="btn btn-secondary" @click="reverseOrder()">
+                Trier par :
+                <span v-if="chronologicalOrder == false">les plus récents</span>
+                <span v-else>les plus anciens</span>
+            </button>                  
+        </div>
+
+        <div class="col-12 col-sm-6 text-end mt-2 mt-sm-0">
+            <router-link to="/newpost" class="btn btn-secondary">
+                Créer un nouveau post
+                <i class="fas fa-pen"></i>
+            </router-link>
         </div>
     </div>
 
-    <div class="container">
-
+    <div v-for="post in posts" :key="post.id" class="row mb-5">
         <Post
-            v-for="post in posts"
-            :key="post"
             :fullName="fullName(post.user.firstName, post.user.lastName)"
             :content="post.content"
             :date="formatedDate(post.createdAt)"
             :imageUrl="post.imageUrl"
+            :postId="post.id"
+            :postUserId="post.userId"
+            :userId="currentUserId"
         ></Post>
-        
     </div>
+
 </template>
 
 <script>
@@ -31,17 +40,14 @@ export default {
     },
     data() {
         return {
-            content: "Ceci n'est pas un post !",
-            imageUrl: "",
-            createdAt: "2021-01-05 18:53:52",
-            firstName: "Céline",
-            lastName: "Sou",
-            posts: []
+            posts: [],
+            chronologicalOrder: false,
         }
     },
     computed: {
-        getToken() {
-            return this.$store.state.token
+        currentUserId: function() {
+            const id = sessionStorage.getItem("userId");
+            return parseInt(id);
         }
     },
     methods: {
@@ -52,9 +58,12 @@ export default {
             const d = new Date(date)
             return new Intl.DateTimeFormat('fr-FR', {day:'2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'}).format(d)
         },
+        reverseOrder() {
+            this.posts.reverse();
+            this.chronologicalOrder = !this.chronologicalOrder;
+        }
     },
-    beforeCreate() {
-        console.log(this.$store.state.token)
+    created() {
         fetch("http://localhost:3000/api/posts", {
             method: 'GET',
             headers: {
@@ -62,7 +71,6 @@ export default {
             }
         })
         .then((res) => {
-            console.log(res)
             if(res.ok) {
                 return res.json()
             }

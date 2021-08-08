@@ -13,7 +13,7 @@
     </div>
 
     <div class="row">
-      <router-view></router-view>
+      <router-view name="HomeView"></router-view>
     </div>
 
   </div>

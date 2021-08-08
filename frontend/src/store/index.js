@@ -3,25 +3,32 @@ import { createStore } from 'vuex'
 const store = createStore({
   state: {
     token: sessionStorage.getItem("token") || "",
-    user: sessionStorage.getItem("user") || {}
+    userId: sessionStorage.getItem("userId") || "",
+    isAdmin: sessionStorage.getItem("isAdmin") || ""
   },
   getters: {
     isLoggedIn: (state) =>  {
-      return !!state.token
+      return !!state.token;
+    },
+    currentUserId: (state) => {
+      return parseInt(state.userId)
     }
   },
   mutations: {
-    auth_success (state, token, user) {
-      state.token = token
-      state.user = user
+    auth_success (state, token, userId, isAdmin) {
+      state.token = token;
+      state.userId = userId;
+      state.isAdmin = isAdmin;
     },
     auth_error (state) {
-      state.token = ""
-      state.user = {}
+      state.token = "";
+      state.userId = "";
+      state.isAdmin = "";
     },
     logout (state) {
-      state.token = ""
-      state.user = {}
+      state.token = "";
+      state.userId = "";
+      state.isAdmin = "";
     }
   },
   actions: {
@@ -37,27 +44,30 @@ const store = createStore({
         })
         .then(res => {
           if (res.ok) {
-            return res.json()
+            return res.json();
           }
         })
         .then(res => {
           const token = res.token;
-          const user = {
-            id: res.userId,
-            isAdmin: res.isAdmin
-          };
+          const userId = res.userId;
+          const isAdmin = res.isAdmin;
 
           sessionStorage.setItem("token", token);
-          sessionStorage.setItem("user", user);
+          sessionStorage.setItem("userId", userId);
+          sessionStorage.setItem("isAdmin", isAdmin);
 
-          commit('auth_success', token, user);
-          resolve(res)
+          return {token, userId, isAdmin}
+
+        })
+        .then((res) => {
+          commit('auth_success', res.token, res.userId, res.isAdmin);
+          resolve(res);
         })
         .catch(error => {
           commit('auth_error');
           reject(error);
-        })        
-      })
+        });      
+      });
     }
   },
   modules: {

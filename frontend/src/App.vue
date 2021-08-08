@@ -11,12 +11,12 @@
         </button>
 
         <div v-if="isLoggedIn == true" id="navbarContent" class="collapse navbar-collapse justify-content-end">
-          <ul class="navbar-nav">
+          <ul class="navbar-nav d-flex align-items-center">
             <li class="nav-item">
-              <router-link to="/profile" class="nav-link text-white">Profile</router-link>
+              <router-link :to="{name: 'Profile', params: {id: userId}}" class="nav-link text-white">Profile</router-link>
             </li>
             <li class="nav-item">
-              <a @click="logOut" href="#" class="nav-link text-white">Déconnexion</a>
+              <button @click="logOut" class="nav-link btn text-white">Déconnexion</button>
             </li>
           </ul>
         </div>
@@ -26,11 +26,7 @@
   </header>
 
   <main class="container mt-4 mb-5 pb-5">
-    <div class="row">
-      <div class="col-12">
-        <router-view></router-view>
-      </div>
-    </div>
+    <router-view></router-view>
   </main>
 
   <footer class="container-fluid fixed-bottom bg-primary py-4">
@@ -43,11 +39,14 @@ export default {
   computed: {
     isLoggedIn: function() {
       return this.$store.getters.isLoggedIn
+    },
+    userId: function() {
+      return this.$store.state.userId
     }
   },
   methods: {
     logOut: function() {
-      sessionStorage.clear;
+      sessionStorage.clear();
       this.$store.commit('logout');
       this.$router.push('/login');
     }

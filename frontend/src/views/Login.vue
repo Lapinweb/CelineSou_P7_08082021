@@ -121,35 +121,6 @@ export default {
     }  
   },
   methods: {
-    submitLogin: function() {
-
-      fetch("http://localhost:3000/api/user/login", {
-        method: "POST",
-        headers: {
-          "Accept": "application/json",
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({email: this.email, password: this.password})
-      })
-      .then(res => {
-        if (res.ok) {
-          return res.json()
-        }
-      })
-      .then(res => {
-        sessionStorage.setItem("token", res.token);
-        sessionStorage.setItem("userId", res.userId);
-        sessionStorage.setItem("isAdmin", res.isAdmin);
-      })
-      .then(() => {
-        const token = sessionStorage.getItem("token")
-        console.log(token)
-        this.$router.push('/posts')
-      })
-      .catch(error => {
-        console.log(error)
-      })
-    },
     signIn: function() {
       this.$store.dispatch('signIn', {
         email: this.email,

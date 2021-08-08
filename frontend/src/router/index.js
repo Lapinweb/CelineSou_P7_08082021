@@ -13,12 +13,12 @@ const routes = [
     children: [{
       path: '/login',
       name: 'Login',
-      component: Login
+      components: {HomeView: Login}
     },
     {
       path: '/signup',
       name: 'Signup',
-      component: Signup
+      components: {HomeView: Signup}
     }]         
   },
   {
@@ -28,13 +28,19 @@ const routes = [
     meta: {requireAuth: true}
   },
   {
-    path: '/post',
+    path: '/post/:id',
     name: 'SinglePost',
     component: () => import('../views/SinglePost.vue'),
     meta: {requireAuth: true}
   },
   {
-    path: '/profile',
+    path: '/newpost',
+    name: 'PostForm',
+    component: () => import('../views/PostForm.vue'),
+    meta: {requireAuth: true}
+  },
+  {
+    path: '/profile/:id',
     name: 'Profile',
     component: () => import('../views/Profile.vue'),
     meta: {requireAuth: true}

@@ -13,7 +13,7 @@
                                 <i class="fas fa-edit"></i>
                             </button>
                             <ul class="dropdown-menu">
-                                <li><button class="dropdown-item">Modifier</button></li>
+                                <li><router-link :to="{name: 'PostModify', params: {id: postId}}" class="dropdown-item">Modifier</router-link></li>
                                 <li><button @click="emitDeletePost" class="dropdown-item">Supprimer</button></li>
                             </ul>
                         </div>
@@ -24,7 +24,7 @@
 
             <router-link :to="{name: 'SinglePost', params: {id: postId}}" class="text-dark text-decoration-none">
                 <div class="card-body">
-                    <p class="card-text">{{ content }}</p>
+                    <p class="card-text pre-wrap">{{ content }}</p>
                 </div>
 
             <img v-if="imageUrl != null" :src="imageUrl" class="card-img-bottom p-1">

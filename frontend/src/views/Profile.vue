@@ -77,9 +77,3 @@ export default {
     }
 }
 </script>
-
-<style lang="scss">
-    .img-cover {
-        object-fit: cover;
-    }
-</style>

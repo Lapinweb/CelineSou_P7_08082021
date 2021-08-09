@@ -74,7 +74,7 @@ exports.modifyPost = (req, res, next) => {
 
                         //renvoie le corps de la requête avec un nouveau imageUrl
                         return {
-                            content: JSON.parse(req.body.content),
+                            content: req.body.content,
                             imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
                         };
                         
@@ -90,7 +90,7 @@ exports.modifyPost = (req, res, next) => {
                 .catch(error => res.status(400).json({ error }));
             }
         })
-        .catch(error => res.status(404).json({ error }));
+        .catch(error => res.status(400).json({ error }));
 };
 
 exports.deletePost = (req, res, next) => {

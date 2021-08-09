@@ -14,16 +14,16 @@
     <div class="row mb-2">
         <form>
             <div class="col-12 col-md-9">
-                <textarea v-model="content" class="form-control border border-secondary textarea-height shadow" placeholder="Ajouter un commentaire"></textarea>
+                <textarea v-model="content" class="form-control border border-secondary textarea-height shadow" placeholder="Ajouter un commentaire" rows="4"></textarea>
             </div>
             <div class="col-12 col-md-9 mt-2 mb-3 text-end">
-                <button @click.prevent="sendComment" class="btn btn-info text-white shadow">Envoyer</button>
+                <button @click.prevent="sendComment" :disabled="disableCommentButton" class="btn btn-info text-white shadow">Envoyer</button>
             </div>
 
         </form>
     </div>
 
-    <div v-if="comments" class="row">
+    <div v-if="comments" class="row mb-1">
         <div v-if="ifNoComment" class="col-12 col-md-9 text-center">
             <p class="mt-3 mb-0 fs-4">Aucun commentaire</p>
         </div>
@@ -73,6 +73,13 @@ export default {
             } else {
                 return false;
             }
+        },
+        disableCommentButton: function() {
+            if (this.content === "") {
+                return true;
+            } else {
+                return false;
+            }
         }
     },
     methods: {
@@ -88,13 +95,6 @@ export default {
                 return true;
             } else {
                 return false;
-            }
-        },
-        disableButton(postUserId) {
-            if (this.currentUserId == postUserId) {
-                return false;
-            } else {
-                return true;
             }
         },
         sendComment() {
@@ -182,7 +182,4 @@ export default {
 </script>
 
 <style lang="scss">
-    .textarea-height {
-        height: 100px;
-    }
 </style>

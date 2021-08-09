@@ -23,8 +23,8 @@ const routes = [
   },
   {
     path: '/posts',
-    name: 'Posts',
-    component: () => import('../views/Posts.vue'),
+    name: 'AllPosts',
+    component: () => import('../views/AllPosts.vue'),
     meta: {requireAuth: true}
   },
   {
@@ -35,8 +35,14 @@ const routes = [
   },
   {
     path: '/newpost',
-    name: 'PostForm',
-    component: () => import('../views/PostForm.vue'),
+    name: 'PostCreate',
+    component: () => import('../views/PostCreate.vue'),
+    meta: {requireAuth: true}
+  },
+  {
+    path: '/post/:id/modify',
+    name: 'PostModify',
+    component: () => import('../views/PostModify.vue'),
     meta: {requireAuth: true}
   },
   {

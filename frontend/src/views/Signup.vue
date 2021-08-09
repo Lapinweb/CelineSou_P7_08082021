@@ -69,7 +69,7 @@
 
         <div class="row my-3">
           <div class="col-12">
-            <button type="submit" class="btn btn-secondary text-white" @click.prevent="signUp" :disabled="disableButton">Envoyer</button> 
+            <button type="submit" class="btn btn-info text-white" @click.prevent="signUp" :disabled="disableButton">Envoyer</button> 
           </div>          
         </div>
 
@@ -80,6 +80,8 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   name: 'Signup',
   data() {
@@ -185,26 +187,17 @@ export default {
   },
   methods: {
     signUp: function() {
-      fetch("http://localhost:3000/api/user/signup", {
-        method: "POST",
-        headers: {
-          "Accept": "application/json",
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
+      axios({
+        url: "http://localhost:3000/api/user/signup",
+        method: 'POST',
+        data: {
           email: this.email,
           password: this.password,
           firstName: this.firstName,
           lastName: this.lastName
-        })
-      })
-      .then(res => {
-        if (res.ok) {
-          return res.json()
         }
       })
-      .then(res => {
-        console.log(res);
+      .then(() => {
         this.$store.dispatch('signIn', {
           email: this.email,
           password: this.password

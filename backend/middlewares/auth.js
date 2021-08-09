@@ -25,7 +25,7 @@ module.exports = (req, res, next) => {
           }
           next();
         })
-        .catch(error => res.status(400).json({ error }));
+        .catch(() => {throw 'Invalid user ID'});
     }
   } catch {
     res.status(401).json({

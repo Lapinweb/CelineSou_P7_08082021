@@ -24,8 +24,8 @@
                 :date="formatedDate(post.createdAt)"
                 :imageUrl="post.imageUrl"
                 :postId="post.id"
-                :postUserId="post.userId"
-                :userId="currentUserId"
+                :showModifyButtons="showModifyButtons(post.userId)"
+                @clickDeletePost="deletePost(post.id)"
             ></Post>
         </div>        
     </div>
@@ -34,7 +34,8 @@
 </template>
 
 <script>
-import Post from '../components/Post.vue'
+import axios from 'axios';
+import Post from '../components/Post.vue';
 
 export default {
     name: 'Posts',
@@ -50,7 +51,10 @@ export default {
     computed: {
         currentUserId: function() {
             return this.$store.getters.currentUserId
-        }
+        },
+        isUserAdmin: function() {
+            return this.$store.getters.isUserAdmin
+        },
     },
     methods: {
         fullName(firstName, lastName) {
@@ -60,26 +64,46 @@ export default {
             const d = new Date(date)
             return new Intl.DateTimeFormat('fr-FR', {day:'2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'}).format(d)
         },
+        showModifyButtons(postUserId) {
+            if (postUserId == this.currentUserId || this.isUserAdmin == true) {
+                return true;
+            } else {
+                return false;
+            }
+        },
         reverseOrder() {
             this.posts.reverse();
             this.chronologicalOrder = !this.chronologicalOrder;
+        },
+        deletePost(postId) {
+            axios({
+                url: "http://localhost:3000/api/posts/" + postId,
+                method: 'DELETE',
+                headers: {
+                    "Authorization": "Bearer " + this.$store.state.token
+                }
+            })
+            .then(() => {
+                alert("Le post a été supprimé !");
+                this.$router.go();
+            })
+            .catch((error) => {
+                alert("Une erreur est survenue !");
+                console.log(error);
+            })
         }
     },
     created() {
-        fetch("http://localhost:3000/api/posts", {
+        axios({
+            url: "http://localhost:3000/api/posts",
             method: 'GET',
             headers: {
                 'Authorization': 'Bearer ' + this.$store.state.token
             }
         })
-        .then((res) => {
-            if(res.ok) {
-                return res.json()
-            }
-        })
         .then((posts) => {
             console.log("posts: ", posts)
-            this.posts = posts
+            this.posts = posts.data
         })
         .catch(error => console.log(error));
     }

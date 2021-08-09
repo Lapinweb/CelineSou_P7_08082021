@@ -7,14 +7,14 @@
                         <p class="mb-0 text-white">{{ fullName }}</p>
                     </div>
 
-                    <div v-if="postUserId == userId" class="col-5 col-sm-3 text-end">
+                    <div v-if="showModifyButtons" class="col-5 col-sm-3 text-end">
                         <div class="dropdown">
                             <button class="btn btn-secondary border border-light dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown">
                                 <i class="fas fa-edit"></i>
                             </button>
                             <ul class="dropdown-menu">
                                 <li><button class="dropdown-item">Modifier</button></li>
-                                <li><button class="dropdown-item">Supprimer</button></li>
+                                <li><button @click="emitDeletePost" class="dropdown-item">Supprimer</button></li>
                             </ul>
                         </div>
                     </div>
@@ -27,7 +27,7 @@
                     <p class="card-text">{{ content }}</p>
                 </div>
 
-            <img v-if="imageUrl != null" :src="imageUrl" class="card-img-bottom">
+            <img v-if="imageUrl != null" :src="imageUrl" class="card-img-bottom p-1">
             </router-link>
 
 
@@ -62,8 +62,12 @@ export default {
             default: false
         },
         postId: Number,
-        postUserId: Number,
-        userId: Number
+        showModifyButtons: Boolean
     },
+    methods: {
+        emitDeletePost() {
+            this.$emit('clickDeletePost')
+        }
+    }
 }
 </script>

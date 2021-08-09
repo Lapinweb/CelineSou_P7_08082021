@@ -6,43 +6,46 @@
             :date="formatedDate(post.createdAt)"
             :imageUrl="post.imageUrl"
             :postId="post.id"
-            :postUserId="post.userId"
-            :userId="currentUserId"
+            :showModifyButtons="showModifyButtons(post.userId)"
+            @clickDeletePost="deletePost(post.id)"
         ></Post>
     </div>
 
-    <div class="row">
+    <div class="row mb-2">
         <form>
             <div class="col-12 col-md-9">
-                <textarea class="form-control border border-secondary textarea-height shadow" placeholder="Ajouter un commentaire"></textarea>
+                <textarea v-model="content" class="form-control border border-secondary textarea-height shadow" placeholder="Ajouter un commentaire"></textarea>
             </div>
             <div class="col-12 col-md-9 mt-2 mb-3 text-end">
-                <button class="btn btn-info text-white shadow">Envoyer</button>
+                <button @click.prevent="sendComment" class="btn btn-info text-white shadow">Envoyer</button>
             </div>
 
         </form>
     </div>
 
     <div v-if="comments" class="row">
+        <div v-if="ifNoComment" class="col-12 col-md-9 text-center">
+            <p class="mt-3 mb-0 fs-4">Aucun commentaire</p>
+        </div>
+
         <Comment
             v-for="(comment, index) in comments" :key="index"
             :fullName="fullName(comment.user.firstName, comment.user.lastName)"
             :comment="comment.content"
             :date="formatedDate(comment.createdAt)"
+            @clickDeleteComment="deleteComment(comment.id)"
         ></Comment>
     </div>
 
-    <div v-else class="row">
-        <div class="col-12 col-md-9 text-center">
-            <p class="mt-3 mb-0 fs-4">Aucun commentaire</p>
-        </div>
-    </div>
+
+
 
 </template>
 
 <script>
-import Post from '../components/Post.vue'
-import Comment from '../components/Comment.vue'
+import axios from 'axios';
+import Post from '../components/Post.vue';
+import Comment from '../components/Comment.vue';
 
 export default {
     name: 'SinglePost',
@@ -53,12 +56,23 @@ export default {
     data() {
         return {
             post: null,
-            comments: null
+            comments: null,
+            content: ""
         }
     },
     computed: {
         currentUserId: function() {
             return this.$store.getters.currentUserId
+        },
+        isUserAdmin: function() {
+            return this.$store.getters.isUserAdmin
+        },
+        ifNoComment: function() {
+            if (this.comments.length === 0) {
+                return true;
+            } else {
+                return false;
+            }
         }
     },
     methods: {
@@ -69,6 +83,13 @@ export default {
             const d = new Date(date)
             return new Intl.DateTimeFormat('fr-FR', {day:'2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'}).format(d)
         },
+        showModifyButtons(postUserId) {
+            if (postUserId == this.currentUserId || this.isUserAdmin == true) {
+                return true;
+            } else {
+                return false;
+            }
+        },
         disableButton(postUserId) {
             if (this.currentUserId == postUserId) {
                 return false;
@@ -76,28 +97,86 @@ export default {
                 return true;
             }
         },
+        sendComment() {
+            axios({
+                url: "http://localhost:3000/api/posts/" + this.$route.params.id + "/comments",
+                method: "POST",
+                headers: {
+                    "Accept": "application/json",
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + this.$store.state.token
+                },
+                data: {content: this.content}
+            })
+            .then(() => {
+                alert("Le commentaire a été posté !");
+                this.$router.go();
+            })
+            .catch(error => {
+                alert("Une erreur est survenue ! Veuillez réessayer !")
+                console.log(error)
+            })
+        },
+        deletePost(postId) {
+            axios({
+                url: "http://localhost:3000/api/posts/" + postId,
+                method: 'DELETE',
+                headers: {
+                    "Authorization": "Bearer " + this.$store.state.token
+                }
+            })
+            .then(() => {
+                alert("Le post a été supprimé !");
+                this.$router.push('/posts');
+            })
+            .catch((error) => {
+                alert("Une erreur est survenue !");
+                console.log(error);
+            })
+        },
+        deleteComment(commentId) {
+            axios({
+                url: "http://localhost:3000/api/comments/" + commentId,
+                method: 'DELETE',
+                headers: {
+                    "Authorization": "Bearer " + this.$store.state.token
+                }
+            })
+            .then(() => {
+                alert("Le commentaire a été supprimé !");
+                this.$router.go();
+            })
+            .catch(() => {
+                alert("Une erreur est survenue !")
+            })
+        }
     },
     created() {
-        fetch("http://localhost:3000/api/posts/" + this.$route.params.id, {
+        const getPosts = axios({
+            url: "http://localhost:3000/api/posts/" + this.$route.params.id,
             method: 'GET',
             headers: {
                 'Authorization': 'Bearer ' + this.$store.state.token
             }
-        })
-        .then((res) => {
-            if(res.ok) {
-                return res.json();
+        });
+
+        const getComments = axios({
+            url: "http://localhost:3000/api/posts/" + this.$route.params.id + "/comments",
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + this.$store.state.token
             }
-        })
-        .then((onePost) => {
-            console.log("post: ", onePost);
-            this.post = onePost;
-            if (onePost.comments.length != 0) {
-                this.comments = onePost.comments;
-            }
-            console.log("this.onePost: ", this.post);
-        })
-        .catch(error => console.log(error));
+        });
+
+        axios.all([getPosts, getComments])
+            .then(axios.spread((post, comments) => {
+                this.post = post.data;
+                this.comments = comments.data;
+                console.log(this.post);
+                console.log(this.comments);
+            }))
+            .catch(error => console.log(error));
+
     }
 }
 </script>

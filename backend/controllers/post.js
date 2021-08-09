@@ -25,15 +25,7 @@ exports.getPagePosts = (req, res, next) => {
 exports.getOnePost = (req, res, next) => {
     Post.findOne({
         where: { id: req.params.id },
-        include: [
-            { model: User, attributes: ['firstName', 'lastName'] },
-            {
-                model: Comment,
-                attributes: ['userId', 'content', 'createdAt'],
-                include: {model: User, attributes: ['firstName', 'lastName']}
-            }
-        ],
-        order: [[{model: Comment, as: 'comments'}, 'createdAt', 'ASC']]
+        include: { model: User, attributes: ['firstName', 'lastName'] }
     })
         .then(post => res.status(200).json(post))
         .catch(error => res.status(404).json({ error }));
@@ -43,7 +35,7 @@ exports.createPost = (req, res, next) => {
     const postObject = req.file ?
     {
         userId: req.user.id,
-        content: JSON.parse(req.body.content),
+        content: req.body.content,
         imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
     } : {
         userId: req.user.id,
@@ -131,7 +123,12 @@ exports.deletePost = (req, res, next) => {
 };
 
 exports.getAllComments = (req, res, next) => {
-    Comment.findAll({ where: { postId: req.params.id }})
+    Comment.findAll({
+        where: { postId: req.params.id },
+        attributes: ['id', 'userId', 'content', 'createdAt'],
+        include: {model: User, attributes: ['firstName', 'lastName']},
+        order: [['createdAt', 'ASC']]
+    })
         .then(comments => res.status(200).json(comments))
         .catch(error => res.status(400).json({ error }));
 };

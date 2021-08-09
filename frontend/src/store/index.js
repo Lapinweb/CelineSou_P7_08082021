@@ -1,4 +1,5 @@
-import { createStore } from 'vuex'
+import { createStore } from 'vuex';
+import axios from 'axios';
 
 const store = createStore({
   state: {
@@ -11,7 +12,14 @@ const store = createStore({
       return !!state.token;
     },
     currentUserId: (state) => {
-      return parseInt(state.userId)
+      return parseInt(state.userId);
+    },
+    isUserAdmin: (state) => {
+      if (state.isAdmin === "true") {
+        return true;
+      } else {
+        return false;
+      }
     }
   },
   mutations: {
@@ -21,36 +29,30 @@ const store = createStore({
       state.isAdmin = sessionStorage.getItem("isAdmin");
     },
     auth_error (state) {
+      sessionStorage.clear();
       state.token = "";
       state.userId = "";
       state.isAdmin = "";
     },
     logout (state) {
+      sessionStorage.clear();
       state.token = "";
       state.userId = "";
       state.isAdmin = "";
     }
   },
   actions: {
-    signIn ({ commit }, user) {
+    signIn ({commit}, user) {
       return new Promise((resolve, reject) => {
-        fetch("http://localhost:3000/api/user/login", {
-          method: "POST",
-          headers: {
-            "Accept": "application/json",
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(user)
+        axios({
+          url: "http://localhost:3000/api/user/login",
+          method: 'POST',
+          data: user
         })
         .then(res => {
-          if (res.ok) {
-            return res.json();
-          }
-        })
-        .then(res => {
-          const token = res.token;
-          const userId = res.userId;
-          const isAdmin = res.isAdmin;
+          const token = res.data.token;
+          const userId = res.data.userId;
+          const isAdmin = res.data.isAdmin;
 
           sessionStorage.setItem("token", token);
           sessionStorage.setItem("userId", userId);
@@ -62,8 +64,8 @@ const store = createStore({
         .catch(error => {
           commit('auth_error');
           reject(error);
-        });      
-      });
+        });
+      })
     }
   },
   modules: {

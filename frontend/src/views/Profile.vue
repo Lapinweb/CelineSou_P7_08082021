@@ -1,8 +1,6 @@
 <template>
     <h1>Profile</h1>
 
-    <div>{{profileUserId}}</div>
-
     <div v-if="user" class="container bg-white border border-secondary border-4 p-0 shadow">
         <div class="row justify-content-between">
             <div class="col-12 col-md-4 mb-3 mb-sm-0 text-center">
@@ -28,6 +26,8 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
     name: 'Profile',
     data() {
@@ -45,42 +45,34 @@ export default {
     },
     methods: {
         deleteAccount: function() {
-            fetch("http://localhost:3000/api/user/" + this.$route.params.id, {
+            axios({
+                url: "http://localhost:3000/api/user/" + this.$route.params.id,
                 method: 'DELETE',
                 headers: {
                     'Authorization': 'Bearer ' + this.$store.state.token
                 }
             })
-            .then((res => {
-                if (res.ok) {
-                    return res.json();
-                }
-            }))
-            .then(res => {
-                alert(res);
+            .then(() => {
                 sessionStorage.clear();
-                this.$router.push('login');
+                alert("Le compte a été supprimé.")
+                this.$router.push({path: "/login"});
             })
-            .catch(res => {
+            .catch((res) => {
                 console.log(res);
                 alert("La suppression du compte a échouée.")
             })
         }
     },
     created() {
-        fetch("http://localhost:3000/api/user/" + this.$route.params.id, {
+        axios({
+            url: "http://localhost:3000/api/user/" + this.$route.params.id,
             method: 'GET',
             headers: {
                 'Authorization': 'Bearer ' + this.$store.state.token
             }
         })
         .then((res) => {
-            if (res.ok) {
-                return res.json()
-            }
-        })
-        .then((res) => {
-            this.user = res;
+            this.user = res.data;
         })
     }
 }

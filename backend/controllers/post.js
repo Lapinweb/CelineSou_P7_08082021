@@ -60,12 +60,24 @@ exports.modifyPost = (req, res, next) => {
                 return res.status(403).json({ error: 'Seul le créateur peut modifier ce poste !'})
                 
             } else {  //si oui
+                console.log('req.body.deleteImage: ', req.body.deleteImage);
+                console.log('!req.hasOwnProperty("file")', !req.hasOwnProperty('file'));
+                console.log('req.hasOwnProperty("file")', req.hasOwnProperty('file'))
                 const postObject = definePostObject();
 
                 //vérifie si le post a une image ajoutée, modifiée ou supprimée
                 function definePostObject() {
+                    //vérifie si l'image d'origine a été supprimé
+                    if (req.body.deleteImage === true) {
+                        if (post.imageUrl !== null) {
+                            const filename = post.imageUrl.split('/images/')[1];
+                            fs.unlink(`images/${filename}`, () => {});
+                        }
+                    }
+
                     //si la requête a une image
                     if (req.hasOwnProperty('file')) {
+                        console.log("req.hasOwnProperty('file'): ", req.hasOwnProperty('file'))
                         //supprime l'image existante si il y en a une
                         if (post.imageUrl !== null) {
                             const filename = post.imageUrl.split('/images/')[1];
@@ -78,10 +90,23 @@ exports.modifyPost = (req, res, next) => {
                             imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
                         };
                         
-                    } else {//sinon, renvoie le corps de la requête
-                        return {
-                            content: req.body.content                   
-                        };
+                    } else {  //si il n'y a pas de nouvelle image
+                        //vérifie si l'image d'origine a été supprimé (si deleteImage = 1)
+                        if (req.body.deleteImage == 1) {
+                            console.log("deleteImage");
+                            const filename = post.imageUrl.split('/images/')[1];
+                            fs.unlink(`images/${filename}`, () => {});
+                            return {
+                                content: req.body.content,
+                                imageUrl: null
+                            }
+                        } else {//sinon, renvoie seulement content
+                            return {
+                                content: req.body.content                   
+                            };                            
+                        }
+
+
                     }
                 };
 

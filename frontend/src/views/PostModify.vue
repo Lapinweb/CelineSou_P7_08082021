@@ -12,7 +12,11 @@
                             <textarea v-model="content" autofocus class="form-control" name="content" id="content" rows="10"></textarea>
                         </div>
 
-                        <div v-if="originalImage && !previewImage" class="col-12 text-center py-3">
+                        <div v-if="originalImage || previewImage" class="col-12 mt-4 me-1 d-flex justify-content-end">
+                            <button @click="deleteExistingImage" type="button" class="btn-close btn-lg" aria-label="Close"></button>
+                        </div>
+
+                        <div v-if="originalImage && !previewImage" class="col-12 text-center pb-3">
                             <img :src="originalImage" class="img-fluid w-100">
                         </div>
 
@@ -25,7 +29,7 @@
                             <label for="image" class="form-label fs-4">Ajouter une image (format png, jpg et jpeg) :</label>
                         </div>
                         <div class="col-12 col-md-6 mb-3">
-                            <input @change="onFileSelected" class="form-control" type="file" accept="image/png, image/jpeg, image/jpg" id="image">
+                            <input @change="onFileSelected" class="form-control" type="file" ref="inputImage" accept="image/png, image/jpeg, image/jpg" id="image">
                         </div>                            
 
 
@@ -51,7 +55,8 @@ export default {
             content: "",
             selectedImage: undefined,
             previewImage: undefined,
-            originalImage: undefined
+            originalImage: undefined,
+            deleteImage: 0
         }
     },
     computed: {
@@ -78,9 +83,18 @@ export default {
             this.selectedImage = file[0];
             console.log("selectedImage: ", this.selectedImage);
         },
+        deleteExistingImage() {
+            if (this.originalImage != undefined) {
+                this.deleteImage = 1;
+                this.originalImage = undefined;
+            }
+            this.previewImage = undefined;
+            this.$refs.inputImage.value = null;
+        },
         modifyPost() {
             const formData = new FormData();
             formData.append('content', this.content);
+            formData.append('deleteImage', this.deleteImage)
 
             if (this.selectedImage !== undefined) {
                 formData.append('image', this.selectedImage)
@@ -97,7 +111,7 @@ export default {
             })
             .then(() => {
                 alert("Le poste a été modifié !");
-                this.$router.push({name: 'AllPosts'});
+                this.$router.push({name: 'SinglePost', params: this.$route.params.id});
             })
             .catch((error) => {
                 console.log(error);

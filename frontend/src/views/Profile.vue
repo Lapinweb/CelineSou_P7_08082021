@@ -53,7 +53,7 @@ export default {
                 }
             })
             .then(() => {
-                sessionStorage.clear();
+                localStorage.clear();
                 alert("Le compte a été supprimé.")
                 this.$router.push({path: "/login"});
             })

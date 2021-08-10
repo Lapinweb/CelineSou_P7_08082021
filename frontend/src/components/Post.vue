@@ -19,17 +19,19 @@
                         </div>
                     </div>
                 </div>
-
             </div>
 
-            <router-link :to="{name: 'SinglePost', params: {id: postId}}" class="text-dark text-decoration-none">
-                <div class="card-body">
+            <div class="position-relative">
+                <router-link :to="{name: 'SinglePost', params: {id: postId}}" class="text-dark text-decoration-none" :class="{'stretched-link': linkToPost}">
+                </router-link>
+                
+                <div class="card-body position-relative">
+
                     <p class="card-text pre-wrap">{{ content }}</p>
                 </div>
 
-            <img v-if="imageUrl != null" :src="imageUrl" class="card-img-bottom p-1">
-            </router-link>
-
+                <img v-if="imageUrl != null" :src="imageUrl" class="card-img-bottom p-1">                
+            </div>
 
             <div class="card-footer bg-secondary">
                 <div class="row">
@@ -37,7 +39,7 @@
                         <p class="mb-0 text-white">{{date}}</p>
                     </div>
 
-                    <div class="col-5 text-end">
+                    <div v-if="showCommentButton" class="col-5 text-end">
                         <router-link :to="{name: 'SinglePost', params: {id: postId}}" class="btn btn-outline-secondary border border-light text-white fs-5">
                             <i class="fas fa-comments"></i>
                         </router-link>                            
@@ -62,7 +64,9 @@ export default {
             default: false
         },
         postId: Number,
-        showModifyButtons: Boolean
+        showModifyButtons: Boolean,
+        showCommentButton: Boolean,
+        linkToPost: Boolean
     },
     methods: {
         emitDeletePost() {

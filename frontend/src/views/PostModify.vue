@@ -97,6 +97,7 @@ export default {
             })
             .then(() => {
                 alert("Le poste a été modifié !");
+                this.$router.push({name: 'AllPosts'});
             })
             .catch((error) => {
                 console.log(error);

@@ -1,16 +1,11 @@
 <template>
     <div class="row py-3 mb-5 d-flex justify-content-between align-items-center">
-        <div class="col-12 col-sm-6">
-            <button class="btn btn-info text-white" @click="reverseOrder()">
-                Trier par :
-                <span v-if="chronologicalOrder == false">les plus récents</span>
-                <span v-else>les plus anciens</span>
-            </button>                  
+        <div class="col-12 col-sm-6">               
         </div>
 
         <div class="col-12 col-sm-6 text-end mt-2 mt-sm-0">
-            <router-link to="/newpost" class="btn btn-info text-white">
-                Créer un nouveau post
+            <router-link to="/newpost" class="btn btn-info text-white fs-5">
+                Nouveau post
                 <i class="fas fa-pen"></i>
             </router-link>
         </div>
@@ -25,6 +20,8 @@
                 :imageUrl="post.imageUrl"
                 :postId="post.id"
                 :showModifyButtons="showModifyButtons(post.userId)"
+                :showCommentButton="true"
+                :linkToPost="true"
                 @clickDeletePost="deletePost(post.id)"
             ></Post>
         </div>        
@@ -70,10 +67,6 @@ export default {
             } else {
                 return false;
             }
-        },
-        reverseOrder() {
-            this.posts.reverse();
-            this.chronologicalOrder = !this.chronologicalOrder;
         },
         deletePost(postId) {
             axios({

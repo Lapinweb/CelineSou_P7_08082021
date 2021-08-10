@@ -28,13 +28,40 @@
             <p class="mt-3 mb-0 fs-4">Aucun commentaire</p>
         </div>
 
-        <Comment
-            v-for="(comment, index) in comments" :key="index"
-            :fullName="fullName(comment.user.firstName, comment.user.lastName)"
-            :comment="comment.content"
-            :date="formatedDate(comment.createdAt)"
-            @clickDeleteComment="deleteComment(comment.id)"
-        ></Comment>
+        <div v-for="(comment, index) in comments" :key="index">
+            <Comment
+                :fullName="fullName(comment.user.firstName, comment.user.lastName)"
+                :comment="comment.content"
+                :date="formatedDate(comment.createdAt)"
+                :showButtons="showModifyButtons(comment.userId)"
+                :linkToPost="false"
+                :showCommentButton="false"
+                @clickDeleteComment="deleteComment(comment.id)"
+                @clickUpdateInput="updateCommentInput(comment.content)"
+            ></Comment>
+
+            <div class="modal fade" id="commentModal" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <p class="mb-0">Modifier le commentaire</p>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form>
+                                <div class="col-12">
+                                    <textarea v-model="modifiedContent" class="form-control border border-secondary textarea-height shadow" rows="4">comment.content</textarea>
+                                </div>
+                                <div class="col-12 mt-2 mb-3 text-end">
+                                    <button @click.prevent="modifyComment(comment.id)" :disabled="disableModifyComment" class="btn btn-info text-white shadow">Envoyer</button>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>            
+        </div>
     </div>
 
 
@@ -57,7 +84,8 @@ export default {
         return {
             post: null,
             comments: null,
-            content: ""
+            content: "",
+            modifiedContent: ""
         }
     },
     computed: {
@@ -80,6 +108,13 @@ export default {
             } else {
                 return false;
             }
+        },
+        disableModifyComment() {
+            if (this.modifiedContent === "") {
+                return true;
+            } else {
+                return false;
+            }
         }
     },
     methods: {
@@ -90,8 +125,8 @@ export default {
             const d = new Date(date)
             return new Intl.DateTimeFormat('fr-FR', {day:'2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'}).format(d)
         },
-        showModifyButtons(postUserId) {
-            if (postUserId == this.currentUserId || this.isUserAdmin == true) {
+        showModifyButtons(componentUserId) {
+            if (componentUserId == this.currentUserId || this.isUserAdmin == true) {
                 return true;
             } else {
                 return false;
@@ -149,6 +184,29 @@ export default {
             .catch(() => {
                 alert("Une erreur est survenue !")
             })
+        },
+        modifyComment(commentId) {
+            axios({
+                url: "http://localhost:3000/api/comments/" + commentId,
+                method: 'PUT',
+                headers: {
+                    "Accept": "application/json",
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + this.$store.state.token
+                },
+                data: {content: this.modifiedContent}
+            })
+            .then(() => {
+                alert("Le commentaire a été modifié !");
+                this.$router.go();
+            })
+            .catch((error) => {
+                console.log(error);
+                alert("Une erreur est survenue !");
+            })
+        },
+        updateCommentInput(commentContent) {
+            this.modifiedContent = commentContent;
         }
     },
     created() {

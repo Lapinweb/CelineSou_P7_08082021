@@ -1,12 +1,12 @@
 <template>
-    <div class="col-12 col-md-9 my-3">
+    <div class="col-12 col-md-9 my-2">
         <div class="row">
             <div class="col-9 d-flex align-items-center">
                 <p class="mb-0 mx-2">{{fullName}}</p> 
             </div>
             
             <div class="col-3 text-end">
-                <button @click="emitDeleteComment" class="btn py-0 fs-5">
+                <button @click="emitDeleteComment" class="btn py-0 fs-5" v-if="showButtons">
                     <i class="fas fa-trash-alt"></i>
                 </button>
             </div>
@@ -20,7 +20,7 @@
 
         <div class="row">
             <div class="col-3">
-                <button class="btn py-0 fs-5">
+                <button @click="emitUpdateInput" class="btn py-0 fs-5" v-if="showButtons" data-bs-toggle="modal" data-bs-target="#commentModal">
                     <i class="far fa-edit"></i>
                 </button>
             </div>
@@ -38,14 +38,15 @@ export default {
     props: {
         fullName: String,
         comment: String,
-        date: String
+        date: String,
+        showButtons: Boolean
     },
     methods: {
         emitDeleteComment() {
             this.$emit('clickDeleteComment');
         },
-        emitModifyComment() {
-            this.$emit('clickModifyComment');
+        emitUpdateInput() {
+            this.$emit('clickUpdateInput');
         }
     }
 }

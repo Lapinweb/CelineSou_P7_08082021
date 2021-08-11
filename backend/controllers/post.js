@@ -8,8 +8,9 @@ const fs = require('fs');
 
 exports.getAllPosts = (req, res, next) => {
     Post.findAll({
-        include: {model: User, attributes: ['firstName', 'lastName']},
-        order: [['createdAt', 'DESC']] })
+        include: { model: User, attributes: ['firstName', 'lastName'] },
+        order: [['createdAt', 'DESC']] 
+    })
         .then(posts => res.status(200).json(posts))
         .catch(error => res.status(400).json({ error }));
 };
@@ -24,7 +25,8 @@ exports.getPagePosts = (req, res, next) => {
 exports.getOnePost = (req, res, next) => {
     Post.findOne({
         where: { id: req.params.id },
-        include: {model: User, attributes: ['firstName', 'lastName']} })
+        include: { model: User, attributes: ['firstName', 'lastName'] }
+    })
         .then(post => res.status(200).json(post))
         .catch(error => res.status(404).json({ error }));
 };
@@ -33,7 +35,7 @@ exports.createPost = (req, res, next) => {
     const postObject = req.file ?
     {
         userId: req.user.id,
-        content: JSON.parse(req.body.content),
+        content: req.body.content,
         imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
     } : {
         userId: req.user.id,
@@ -58,12 +60,24 @@ exports.modifyPost = (req, res, next) => {
                 return res.status(403).json({ error: 'Seul le créateur peut modifier ce poste !'})
                 
             } else {  //si oui
+                console.log('req.body.deleteImage: ', req.body.deleteImage);
+                console.log('!req.hasOwnProperty("file")', !req.hasOwnProperty('file'));
+                console.log('req.hasOwnProperty("file")', req.hasOwnProperty('file'))
                 const postObject = definePostObject();
 
                 //vérifie si le post a une image ajoutée, modifiée ou supprimée
                 function definePostObject() {
+                    //vérifie si l'image d'origine a été supprimé
+                    if (req.body.deleteImage === true) {
+                        if (post.imageUrl !== null) {
+                            const filename = post.imageUrl.split('/images/')[1];
+                            fs.unlink(`images/${filename}`, () => {});
+                        }
+                    }
+
                     //si la requête a une image
                     if (req.hasOwnProperty('file')) {
+                        console.log("req.hasOwnProperty('file'): ", req.hasOwnProperty('file'))
                         //supprime l'image existante si il y en a une
                         if (post.imageUrl !== null) {
                             const filename = post.imageUrl.split('/images/')[1];
@@ -72,14 +86,27 @@ exports.modifyPost = (req, res, next) => {
 
                         //renvoie le corps de la requête avec un nouveau imageUrl
                         return {
-                            content: JSON.parse(req.body.content),
+                            content: req.body.content,
                             imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
                         };
                         
-                    } else {//sinon, renvoie le corps de la requête
-                        return {
-                            content: req.body.content                   
-                        };
+                    } else {  //si il n'y a pas de nouvelle image
+                        //vérifie si l'image d'origine a été supprimé (si deleteImage = 1)
+                        if (req.body.deleteImage == 1) {
+                            console.log("deleteImage");
+                            const filename = post.imageUrl.split('/images/')[1];
+                            fs.unlink(`images/${filename}`, () => {});
+                            return {
+                                content: req.body.content,
+                                imageUrl: null
+                            }
+                        } else {//sinon, renvoie seulement content
+                            return {
+                                content: req.body.content                   
+                            };                            
+                        }
+
+
                     }
                 };
 
@@ -88,7 +115,7 @@ exports.modifyPost = (req, res, next) => {
                 .catch(error => res.status(400).json({ error }));
             }
         })
-        .catch(error => res.status(404).json({ error }));
+        .catch(error => res.status(400).json({ error }));
 };
 
 exports.deletePost = (req, res, next) => {
@@ -121,7 +148,12 @@ exports.deletePost = (req, res, next) => {
 };
 
 exports.getAllComments = (req, res, next) => {
-    Comment.findAll({ where: { postId: req.params.id }})
+    Comment.findAll({
+        where: { postId: req.params.id },
+        attributes: ['id', 'userId', 'content', 'createdAt'],
+        include: {model: User, attributes: ['firstName', 'lastName']},
+        order: [['createdAt', 'ASC']]
+    })
         .then(comments => res.status(200).json(comments))
         .catch(error => res.status(400).json({ error }));
 };

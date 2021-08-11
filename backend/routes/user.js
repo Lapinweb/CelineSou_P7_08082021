@@ -11,6 +11,5 @@ router.post('/signup', userCtrl.signup);
 router.post('/login', rateLimiter, userCtrl.login);
 router.delete('/:id', auth, userCtrl.deleteAccount);
 router.get('/:id', auth, userCtrl.getUser);
-router.put('/:id', auth, multer, userCtrl.modifyProfilePicture);
 
 module.exports = router;

@@ -3,4 +3,12 @@ $secondary: #197E95FF;
 
 $enable-shadows: true;
 
+.pre-wrap {
+    white-space: pre-wrap;
+}
+
+.img-cover {
+    object-fit: cover;
+}
+
 @import "node_modules/bootstrap/scss/bootstrap";

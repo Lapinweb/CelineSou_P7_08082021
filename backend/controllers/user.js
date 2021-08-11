@@ -57,23 +57,12 @@ exports.deleteAccount = (req, res, next) => {
     User.findByPk(req.params.id)
         .then(user => {
             //vérifie si l'id correspond à l'id du token stocké dans req.id ou si l'utilisateur est administrateur
-            if (user.id !== req.user.id) {
+            if (user.id !== req.user.id && req.user.isAdmin == false) {
                 return res.status(403).json({ error: "Seul le propriétaire du compte peut le supprimer !"})
-            } else {
-                //supprime l'image du profile si elle existe
-                if (user.imageUrl !== null) {
-                    const filename = user.imageUrl.split('/images/')[1];
-                            fs.unlink(`images/${filename}`, () => {
-                                User.destroy({ where: { id: req.params.id }} )
-                                    .then(() => res.status(200).json({ message: 'Utilisateur supprimé !' }))
-                                    .catch(error => res.status(400).json({ error }));
-                            });
-                } else {  //ou supprime l'utilisateur directement
-                    User.destroy({ where: { id: req.params.id }} )
-                                    .then(() => res.status(200).json({ message: 'Utilisateur supprimé !' }))
-                                    .catch(error => res.status(400).json({ error }));
-                }
-
+            } else {  //supprime l'utilisateur
+                User.destroy({ where: { id: req.params.id }} )
+                    .then(() => res.status(200).json({ message: 'Utilisateur supprimé !' }))
+                    .catch(error => res.status(400).json({ error }));
             }
         })
         .catch(error => res.status(400).json({ error }));
@@ -97,37 +86,7 @@ exports.getUser = (req, res, next) => {
             };
             const maskedEmail = MaskData.maskEmail2(email, emailMask2Options);
             
-            res.status(200).json({email: maskedEmail, firstName: user.firstName, lastName: user.lastName, imageUrl: user.imageUrl})
+            res.status(200).json({email: maskedEmail, firstName: user.firstName, lastName: user.lastName})
         })
         .catch(error => res.status(400).json({ error }));
 };
-
-exports.modifyProfilePicture = (req, res, next) => {
-    User.findByPk(req.params.id)
-        .then(user => {
-            //vérifie si l'id dans le token correspond à l'id utilisateur
-            if ( user.id != req.user.id ) {  //si non
-                if (req.hasOwnProperty('file')) {  //supprime l'image enregistrée par multer si elle existe
-                    fs.unlink(`images/${req.file.filename}`, () => {
-                        return res.status(403).json({ error: 'Seul le propriétaire peut modifier sa photo de profil !'})
-                    });
-                }
-            } else {
-                //supprime l'image existante si il y en a une
-                if (user.imageUrl !== null) {
-                    const filename = user.imageUrl.split('/images/')[1];
-                            fs.unlink(`images/${filename}`, () => {});
-                }
-                User.update(
-                    {imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`},
-                    { where: { id: req.params.id } }
-                )
-                .then(() => res.status(200).json({ message: 'Image de profile modifié !' }))
-                .catch(error => { 
-                    console.log(error);
-                    res.status(400).json({ error }) 
-                });
-            }
-        })
-        .catch(error => res.status(400).json({ error }));
-}

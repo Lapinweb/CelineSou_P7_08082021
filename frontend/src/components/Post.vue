@@ -7,29 +7,31 @@
                         <p class="mb-0 text-white">{{ fullName }}</p>
                     </div>
 
-                    <div v-if="postUserId == userId" class="col-5 col-sm-3 text-end">
+                    <div v-if="showModifyButtons" class="col-5 col-sm-3 text-end">
                         <div class="dropdown">
                             <button class="btn btn-secondary border border-light dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown">
                                 <i class="fas fa-edit"></i>
                             </button>
                             <ul class="dropdown-menu">
-                                <li><button class="dropdown-item">Modifier</button></li>
-                                <li><button class="dropdown-item">Supprimer</button></li>
+                                <li><router-link :to="{name: 'PostModify', params: {id: postId}}" class="dropdown-item">Modifier</router-link></li>
+                                <li><button @click="emitDeletePost" class="dropdown-item">Supprimer</button></li>
                             </ul>
                         </div>
                     </div>
                 </div>
-
             </div>
 
-            <router-link :to="{name: 'SinglePost', params: {id: postId}}" class="text-dark text-decoration-none">
-                <div class="card-body">
-                    <p class="card-text">{{ content }}</p>
+            <div class="position-relative">
+                <router-link :to="{name: 'SinglePost', params: {id: postId}}" class="text-dark text-decoration-none" :class="{'stretched-link': linkToPost}">
+                </router-link>
+                
+                <div class="card-body position-relative">
+
+                    <p class="card-text pre-wrap">{{ content }}</p>
                 </div>
 
-            <img v-if="imageUrl != null" :src="imageUrl" class="card-img-bottom">
-            </router-link>
-
+                <img v-if="imageUrl != null" :src="imageUrl" class="card-img-bottom p-1">                
+            </div>
 
             <div class="card-footer bg-secondary">
                 <div class="row">
@@ -37,10 +39,10 @@
                         <p class="mb-0 text-white">{{date}}</p>
                     </div>
 
-                    <div class="col-5 text-end">
-                        <button class="btn btn-outline-secondary border border-light text-white fs-5">
+                    <div v-if="showCommentButton" class="col-5 text-end">
+                        <router-link :to="{name: 'SinglePost', params: {id: postId}}" class="btn btn-outline-secondary border border-light text-white fs-5">
                             <i class="fas fa-comments"></i>
-                        </button>                            
+                        </router-link>                            
                     </div>
                     
                 </div>
@@ -62,8 +64,14 @@ export default {
             default: false
         },
         postId: Number,
-        postUserId: Number,
-        userId: Number
+        showModifyButtons: Boolean,
+        showCommentButton: Boolean,
+        linkToPost: Boolean
     },
+    methods: {
+        emitDeletePost() {
+            this.$emit('clickDeletePost')
+        }
+    }
 }
 </script>

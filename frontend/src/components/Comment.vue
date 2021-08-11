@@ -1,5 +1,5 @@
 <template>
-    <div class="col-12 col-md-9 my-2">
+    <div class="col-12 col-md-9 mt-2 mb-3">
         <div class="row">
             <div class="col-9 d-flex align-items-center">
                 <p class="mb-0 mx-2">{{fullName}}</p> 

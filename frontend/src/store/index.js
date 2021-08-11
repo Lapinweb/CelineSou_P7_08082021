@@ -8,25 +8,21 @@ const store = createStore({
         isAdmin: localStorage.getItem("isAdmin") || ""
     },
     getters: {
-        isLoggedIn: (state) =>  {
+        isLoggedIn: (state) =>  {   //vérifie si l'utilisateur est connecté grâce à la présence du token
             return !!state.token;
         },
-        currentUserId: (state) => {
+        currentUserId: (state) => {     //renvoie l'ID de l'utilisateur
             return parseInt(state.userId);
         },
-        isUserAdmin: (state) => {
-            if (state.isAdmin === "true") {
-                return true;
-            } else {
-                return false;
-            }
+        isUserAdmin: (state) => {   //vérifie si l'utilisateur est administrateur
+            return state.isAdmin;
         }
     },
     mutations: {
-        auth_success (state) {
-            state.token = localStorage.getItem("token");
-            state.userId = localStorage.getItem("userId");
-            state.isAdmin = localStorage.getItem("isAdmin");
+        auth_success (state, {token, userId, isAdmin}) {
+            state.token = token;
+            state.userId = userId;
+            state.isAdmin = isAdmin;
         },
         auth_error (state) {
             localStorage.clear();
@@ -58,7 +54,7 @@ const store = createStore({
                     localStorage.setItem("userId", userId);
                     localStorage.setItem("isAdmin", isAdmin);
 
-                    commit('auth_success');
+                    commit('auth_success',{token, userId, isAdmin});
                     resolve(res);
                 })
                     .catch(error => {

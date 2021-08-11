@@ -1,13 +1,16 @@
 <template>
     <div class="row mx-0 px-0">
         <div class="col bg-white border border-secondary border-3 rounded-3">
+            <!--Titre-->
             <div class="row my-2">
                 <div class="col-12">
                     <h1 class="text-secondary">Créer un compte</h1>
                 </div>        
             </div>
 
+            <!--Formulaire-->
             <form class="row mt-3">
+                <!--Email-->
                 <div class="col-12 col-md-6 mb-3">
                     <label for="email" class="form-label">
                         Adresse email
@@ -16,6 +19,7 @@
 
                     <input required v-model="email" type="email" name="email" id="email" class="form-control" :class="classEmail">            
                     
+                    <!--Message si email invalide-->
                     <div v-if="showEmailMessage === true" class="mt-1 text-end">
                         <p class="fs-6 text-danger">
                             L'email doit être valide.
@@ -23,6 +27,7 @@
                     </div>       
                 </div>
 
+                <!--Mot de passe-->
                 <div class="col-12 col-md-6 mb-3">
                     <label for="password" class="form-label">
                         Mot de passe
@@ -31,6 +36,7 @@
 
                     <input required v-model="password" type="text" name="password" id="password" class="form-control" :class="classPassword">
                 
+                    <!--Message si mot de passe invalide-->
                     <div v-if="showPasswordMessage === true" class="mt-1 text-end">
                         <p class="fs-6 text-danger">
                             Minimum 8 lettres, avec 1 majuscule, 1 minuscule, 1 chiffre et 1 symbole.
@@ -38,6 +44,7 @@
                     </div>
                 </div>
 
+                <!--Prénom-->
                 <div class="col-12 col-md-6 mb-3">
                     <label for="firstName" class="form-label">
                         Prénom
@@ -46,6 +53,7 @@
                     <input required v-model="firstName" type="text" name="firstName" id="firstName" class="form-control" :class="classFirstName">
                 </div>
 
+                <!--Nom de famille-->
                 <div class="col-12 col-md-6 mb-3">
                     <label for="lastName" class="form-label">
                         Nom de famille
@@ -54,6 +62,7 @@
                     <input required v-model="lastName" type="text" name="lastName" id="lastName" class="form-control" :class="classLastName">            
                 </div>
 
+                <!--Message si nom ou prénom invalide-->
                 <div v-if="showNameMessage === true" class="row mt-1 text-end mt-0">
                     <p class="fs-6 text-danger">
                         Les noms et prénoms n'acceptent que les lettres.
@@ -66,6 +75,7 @@
                     </div>
                 </div>
 
+                <!--Bouton "Envoyer"-->
                 <div class="row my-3">
                     <div class="col-12">
                         <button type="submit" class="btn btn-info text-white" @click.prevent="signUp" :disabled="disableButton">Envoyer</button> 
@@ -95,7 +105,7 @@ export default {
         }
     },
     computed: {
-        classEmail: function() {
+        classEmail: function() {    //détermine la classe de l'input email
             if (this.email == "") {
                 return {};
             }
@@ -110,7 +120,7 @@ export default {
                 };
             }
         },
-        classPassword: function() {
+        classPassword: function() { //détermine la classe de l'input password
             if (this.password == "") {
                 return {}
             }
@@ -125,7 +135,7 @@ export default {
                 };
             }      
         },
-        classFirstName: function() {
+        classFirstName: function() {    //détermine la classe de l'input firstName
             if (this.firstName == "") {
                 return {}
             }
@@ -140,51 +150,52 @@ export default {
                 };
             }      
         },
-        classLastName: function() {
-        if (this.lastName == "") {
-            return {}
-        }
+        classLastName: function() { //détermine la classe de l'input lastName
+            if (this.lastName == "") {
+                return {}
+            }
 
-        if(this.regexName.test(this.lastName)) {
-            return {
-                'is-valid': true
-            };
-        } else {
-            return {
-                'is-invalid': true
-            };
-        }      
+            if(this.regexName.test(this.lastName)) {
+                return {
+                    'is-valid': true
+                };
+            } else {
+                return {
+                    'is-invalid': true
+                };
+            }      
         },
-        disableButton: function() {
-        if (!this.regexEmail.test(this.email) || !this.regexPassword.test(this.password) || !this.regexName.test(this.firstName) || !this.regexName.test(this.lastName)) {
-            return true
-        } else {
-            return false
-        }
+        disableButton: function() { //désactive le bouton "Envoyer" si tous les champs ne sont pas valide
+            if (!this.regexEmail.test(this.email) || !this.regexPassword.test(this.password) || !this.regexName.test(this.firstName) || !this.regexName.test(this.lastName)) {
+                return true
+            } else {
+                return false
+            }
         },
-        showEmailMessage: function() {
-        if (this.regexEmail.test(this.email) || this.email == "") {
-            return false
-        } else {
-            return true
-        }
+        showEmailMessage: function() {  //affiche un message si l'email n'est pas valide
+            if (this.regexEmail.test(this.email) || this.email == "") {
+                return false
+            } else {
+                return true
+            }
         },
-        showPasswordMessage: function() {
-        if (this.regexPassword.test(this.password) || this.password == "") {
-            return false
-        } else {
-            return true
-        }
+        showPasswordMessage: function() {   //affiche un message si le mot de passe n'est pas valide
+            if (this.regexPassword.test(this.password) || this.password == "") {
+                return false
+            } else {
+                return true
+            }
         },
-        showNameMessage: function() {
-        if ((this.regexName.test(this.firstName) && this.regexName.test(this.lastName)) || (this.firstName == "" && this.lastName == "")) {
-            return false
-        } else {
-            return true
-        }
+        showNameMessage: function() {   //affiche un message si les nom et prénom ne sont pas valide
+            if ((this.regexName.test(this.firstName) && this.regexName.test(this.lastName)) || (this.firstName == "" && this.lastName == "")) {
+                return false
+            } else {
+                return true
+            }
         }
     },
     methods: {
+        //fonction signup
         signUp: function() {
             axios({
                 url: "http://localhost:3000/api/user/signup",
@@ -196,21 +207,19 @@ export default {
                 lastName: this.lastName
                 }
             })
-            .then(() => {
+            .then(() => {   //après l'inscription, connecte l'utilisateur
                 this.$store.dispatch('signIn', {
                 email: this.email,
                 password: this.password
                 })
-                .then(() => {
+                .then(() => {   //puis redirige vers la page "posts"
                 this.$router.push('posts')
                 })
-                .catch(error => {
-                console.log(error)
+                .catch(() => {
                 alert("Le compte a été créé mais la connexion à celle-ci a échouée!")
                 })
             })
-            .catch(error => {
-                console.log(error);
+            .catch(() => {
                 alert("La création d'un nouveau compte a échouée !")
             })
         }

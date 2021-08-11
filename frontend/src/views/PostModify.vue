@@ -2,29 +2,36 @@
     <div class="row mb-1">
         <div class="col-12 col-md-9">
             <div class="card shadow border border-secondary">
+                <!--Titre-->
                 <div class="card-header bg-secondary">
                     <h1 class="fs-3 text-white mb-1">Modifier le post</h1>
                 </div>
+
+                <!--Formulaire pour modifier le post-->
                 <div class="card-body py-1">
                     <form class="row p-0">
+                        <!--Contenu texte-->
                         <div class="col-12 px-0">
                             <label for="content" class="form-label fs-4 ms-2">Ecrire ici :</label>
                             <textarea v-model="content" autofocus class="form-control" name="content" id="content" rows="10"></textarea>
                         </div>
 
+                        <!--Bouton pour enlever l'image affichée-->
                         <div v-if="originalImage || previewImage" class="col-12 mt-4 me-1 d-flex justify-content-end">
                             <button @click="deleteExistingImage" type="button" class="btn-close btn-lg" aria-label="Close"></button>
                         </div>
 
+                        <!--Affiche l'image original si il y en a une-->
                         <div v-if="originalImage && !previewImage" class="col-12 text-center pb-3">
                             <img :src="originalImage" class="img-fluid w-100">
                         </div>
 
+                        <!--Affiche la nouvelle image sélectionné-->
                         <div v-else-if="previewImage" class="col-12 text-center py-3">
                             <img :src="previewImage" class="img-fluid w-100">
                         </div>
                         
-
+                        <!--Choix de l'image-->
                         <div class="col-12 mt-3">
                             <label for="image" class="form-label fs-4">Ajouter une image (format png, jpg et jpeg) :</label>
                         </div>
@@ -33,9 +40,9 @@
                         </div>                            
 
 
-                        
+                        <!--Bouton pour envoyer le post modifié-->
                         <div class="col-12 col-md-6 text-end mb-3 pe-5">
-                            <button @click.prevent="modifyPost" :disabled="disableButton" class="btn btn-info btn-lg text-white">Poster</button>
+                            <button @click.prevent="modifyPost" :disabled="disableButton" class="btn btn-info btn-lg">Publier</button>
                         </div>
                     </form>
                 </div>
@@ -60,7 +67,7 @@ export default {
         }
     },
     computed: {
-        disableButton() {
+        disableButton() {   //désactive le bouton si l'input texte est vide
             if(this.content == "") {
                 return true;
             } else {
@@ -68,22 +75,24 @@ export default {
             }
         }
     },
-    methods: {
+    methods: { 
         onFileSelected(event) {
+            //récupère l'image sélectionné dans l'input file
             const file = event.target.files
             const reader = new FileReader();
-            if (file && file[0]) {
+            if (file && file[0]) {  //affiche l'image sélectionnée
                 reader.onload = (e) => {
                     this.previewImage = e.target.result;
                 }
                 reader.readAsDataURL(file[0]);
-            } else {
+            } else {    //ou l'enlève
                 this.previewImage = undefined;
             }
             this.selectedImage = file[0];
             console.log("selectedImage: ", this.selectedImage);
         },
-        deleteExistingImage() {
+        deleteExistingImage() { //retire l'image en cliquant sur le bouton
+            //si le post avait déjà une image, qu'elle est supprimée grâce à "deleteImage"
             if (this.originalImage != undefined) {
                 this.deleteImage = 1;
                 this.originalImage = undefined;
@@ -91,6 +100,7 @@ export default {
             this.previewImage = undefined;
             this.$refs.inputImage.value = null;
         },
+        //fonction modifier un post
         modifyPost() {
             const formData = new FormData();
             formData.append('content', this.content);
@@ -120,6 +130,7 @@ export default {
         }
     },
     created() {
+        //récupère le post à modifier
         axios({
             url: "http://localhost:3000/api/posts/" + this.$route.params.id,
             method: 'get',

@@ -8,7 +8,7 @@ const routes = [
     {
         path: '/',
         name: 'Home',
-        redirect: '/posts',
+        redirect: '/posts', //redirige vers posts puis si l'utilisateur n'est pas connecté, renvoie vers login
         component: Home,
         children: [{
             path: '/login',
@@ -59,8 +59,8 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-    if (to.matched.some(record => record.meta.requireAuth)) {
-        if(!store.getters.isLoggedIn) {
+    if (to.matched.some(record => record.meta.requireAuth)) {   //vérifie que l'utilisateur est connecté
+        if(!store.getters.isLoggedIn) { //si non, renvoie vers login
             next({ name: 'Login' });
         } else {
             next();

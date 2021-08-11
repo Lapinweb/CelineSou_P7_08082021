@@ -1,5 +1,6 @@
 <template>
-    <div v-if="post" class="row mb-3">
+    <!--Affiche un post-->
+    <div v-if="post" class="row mb-3"><!--Affiche seulment si le post a été récupéré-->
         <Post
             :fullName="fullName(post.user.firstName, post.user.lastName)"
             :content="post.content"
@@ -11,19 +12,24 @@
         ></Post>
     </div>
 
+    <!--Formulaire pour créer un nouveau commentaire-->
     <div class="row mb-2">
         <form>
+            <!--Champs texte du commentaire à créer-->
             <div class="col-12 col-md-9">
                 <textarea v-model="content" class="form-control border border-secondary textarea-height shadow" placeholder="Ajouter un commentaire" rows="4"></textarea>
             </div>
-            <div class="col-12 col-md-9 mt-2 mb-3 text-end">
-                <button @click.prevent="sendComment" :disabled="disableCommentButton" class="btn btn-info text-white shadow">Envoyer</button>
-            </div>
 
+            <!--Bouton pour envoyer le commentaire-->
+            <div class="col-12 col-md-9 mt-2 mb-3 text-end">
+                <button @click.prevent="sendComment" :disabled="disableCommentButton" class="btn btn-info shadow">Envoyer</button>
+            </div>
         </form>
     </div>
 
-    <div v-if="comments" class="row mb-1">
+    <!--Affiche tous les commentaires-->
+    <div v-if="comments" class="row mb-1">  <!--montre seulement si les commentaires ont été récupérés-->
+        <!--Message si le tableau de commentaire est vide-->
         <div v-if="ifNoComment" class="col-12 col-md-9 text-center">
             <p class="mt-3 mb-0 fs-4">Aucun commentaire</p>
         </div>
@@ -40,24 +46,30 @@
                 @clickUpdateInput="updateCommentInput(comment.content)"
             ></Comment>
 
+            <!--Modal qui s'affiche pour modifier un commentaire-->
             <div class="modal fade" id="commentModal" tabindex="-1">
                 <div class="modal-dialog">
                     <div class="modal-content">
+
+                        <!--Titre du modal-->
                         <div class="modal-header">
                             <p class="mb-0">Modifier le commentaire</p>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
+
+                        <!--Formulaire pour modifier un commentaire-->
                         <div class="modal-body">
                             <form>
                                 <div class="col-12">
                                     <textarea v-model="modifiedContent" class="form-control border border-secondary textarea-height shadow" rows="4">comment.content</textarea>
                                 </div>
-                                <div class="col-12 mt-2 mb-3 text-end">
-                                    <button @click.prevent="modifyComment(comment.id)" :disabled="disableModifyComment" class="btn btn-info text-white shadow">Envoyer</button>
-                                </div>
 
+                                <div class="col-12 mt-2 mb-3 text-end">
+                                    <button @click.prevent="modifyComment(comment.id)" :disabled="disableModifyComment" class="btn btn-info shadow">Envoyer</button>
+                                </div>
                             </form>
                         </div>
+
                     </div>
                 </div>
             </div>            
@@ -84,8 +96,8 @@ export default {
         return {
             post: null,
             comments: null,
-            content: "",
-            modifiedContent: ""
+            content: "",    //contenu du nouveau commentaire
+            modifiedContent: "" //contenu du commentaire modifié
         }
     },
     computed: {
@@ -103,6 +115,7 @@ export default {
             }
         },
         disableCommentButton: function() {
+            //désactive le bouton "Envoyer" si l'input est vide
             if (this.content === "") {
                 return true;
             } else {
@@ -110,6 +123,7 @@ export default {
             }
         },
         disableModifyComment() {
+            //désactive le bouton "Envoyer" pour modifier le commentaire si l'input est vide
             if (this.modifiedContent === "") {
                 return true;
             } else {
@@ -118,20 +132,39 @@ export default {
         }
     },
     methods: {
-        fullName(firstName, lastName) {
+        fullName(firstName, lastName) { //concaténe le prénon et le nom de famille
             return `${firstName} ${lastName}`
         },
-        formatedDate(date) {
+        formatedDate(date) {    //renvoie la date dans un autre format
             const d = new Date(date)
             return new Intl.DateTimeFormat('fr-FR', {day:'2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'}).format(d)
         },
-        showModifyButtons(componentUserId) {
-            if (componentUserId == this.currentUserId || this.isUserAdmin == true) {
+        showModifyButtons(componentUserId) {    //vérifie si l'utilisateur est le créateur du commentaire ou un administrateur
+            if (componentUserId == this.currentUserId || this.isUserAdmin) {
                 return true;
             } else {
                 return false;
             }
         },
+        //fonction supprimer un post
+        deletePost(postId) {
+            axios({
+                url: "http://localhost:3000/api/posts/" + postId,
+                method: 'DELETE',
+                headers: {
+                    "Authorization": "Bearer " + this.$store.state.token
+                }
+            })
+            .then(() => {
+                alert("Le post a été supprimé !");
+                this.$router.push('/posts');
+            })
+            .catch((error) => {
+                alert("Une erreur est survenue !");
+                console.log(error);
+            })
+        },
+        //fonction envoyer un commentaire
         sendComment() {
             axios({
                 url: "http://localhost:3000/api/posts/" + this.$route.params.id + "/comments",
@@ -152,23 +185,7 @@ export default {
                 console.log(error)
             })
         },
-        deletePost(postId) {
-            axios({
-                url: "http://localhost:3000/api/posts/" + postId,
-                method: 'DELETE',
-                headers: {
-                    "Authorization": "Bearer " + this.$store.state.token
-                }
-            })
-            .then(() => {
-                alert("Le post a été supprimé !");
-                this.$router.push('/posts');
-            })
-            .catch((error) => {
-                alert("Une erreur est survenue !");
-                console.log(error);
-            })
-        },
+        //fonction supprimer un commentaire
         deleteComment(commentId) {
             axios({
                 url: "http://localhost:3000/api/comments/" + commentId,
@@ -185,6 +202,7 @@ export default {
                 alert("Une erreur est survenue !")
             })
         },
+        //fonction modifier un commentaire
         modifyComment(commentId) {
             axios({
                 url: "http://localhost:3000/api/comments/" + commentId,
@@ -205,12 +223,14 @@ export default {
                 alert("Une erreur est survenue !");
             })
         },
+        //en appuyant sur le bouton pour modifier un commentaire, modifie la valeur dans l'input
         updateCommentInput(commentContent) {
             this.modifiedContent = commentContent;
         }
     },
     created() {
-        const getPosts = axios({
+        //récupère le post grâce à l'id du post en paramètre d'URL
+        const getPost = axios({
             url: "http://localhost:3000/api/posts/" + this.$route.params.id,
             method: 'GET',
             headers: {
@@ -218,6 +238,7 @@ export default {
             }
         });
 
+        //récupère tous les commentaires correspondant à l'id du post
         const getComments = axios({
             url: "http://localhost:3000/api/posts/" + this.$route.params.id + "/comments",
             method: 'GET',
@@ -226,7 +247,7 @@ export default {
             }
         });
 
-        axios.all([getPosts, getComments])
+        axios.all([getPost, getComments])
             .then(axios.spread((post, comments) => {
                 this.post = post.data;
                 this.comments = comments.data;

@@ -6,7 +6,7 @@
             </div>
             
             <div class="col-3 text-end">
-                <button @click="emitDeleteComment" class="btn py-0 fs-5" v-if="showButtons">
+                <button v-if="showButtons" @click="emitDeleteComment" class="btn py-0 fs-5">
                     <i class="fas fa-trash-alt"></i>
                 </button>
             </div>
@@ -20,7 +20,7 @@
 
         <div class="row">
             <div class="col-3">
-                <button @click="emitUpdateInput" class="btn py-0 fs-5" v-if="showButtons" data-bs-toggle="modal" data-bs-target="#commentModal">
+                <button v-if="showButtons" @click="emitUpdateInput" class="btn py-0 fs-5" data-bs-toggle="modal" data-bs-target="#commentModal">
                     <i class="far fa-edit"></i>
                 </button>
             </div>

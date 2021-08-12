@@ -89,7 +89,6 @@ export default {
                 this.previewImage = undefined;
             }
             this.selectedImage = file[0];
-            console.log("selectedImage: ", this.selectedImage);
         },
         deleteExistingImage() { //retire l'image en cliquant sur le bouton
             //si le post avait déjà une image, qu'elle est supprimée grâce à "deleteImage"
@@ -123,8 +122,7 @@ export default {
                 alert("Le poste a été modifié !");
                 this.$router.push({name: 'SinglePost', params: this.$route.params.id});
             })
-            .catch((error) => {
-                console.log(error);
+            .catch(() => {
                 alert("Une erreur est survenue !")
             })
         }

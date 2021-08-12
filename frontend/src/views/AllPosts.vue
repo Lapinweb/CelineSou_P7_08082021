@@ -13,7 +13,7 @@
     </div>
 
     <!--Affichage de tous les posts-->
-    <template v-if="posts"> <!--montre seulement si les posts ont été récupérés-->
+    <div v-if="posts"> <!--montre seulement si les posts ont été récupérés-->
         <div v-for="(post, index) in posts" :key="index" class="row mb-5"><!--boucle du tableau posts-->
             <Post
                 :fullName="fullName(post.user.firstName, post.user.lastName)"
@@ -21,13 +21,14 @@
                 :date="formattedDate(post.createdAt)"
                 :imageUrl="post.imageUrl"
                 :postId="post.id"
+                
                 :showModifyButtons="showModifyButtons(post.userId)"
                 :showCommentButton="true"
                 :linkToPost="true"
                 @clickDeletePost="deletePost(post.id)"
             ></Post>
         </div>        
-    </template>
+    </div>
 
 
 </template>
@@ -35,7 +36,6 @@
 <script>
 import axios from 'axios';
 import Post from '../components/Post.vue';
-import { mapGetters } from 'vuex';
 
 export default {
     name: 'Posts',
@@ -49,9 +49,11 @@ export default {
         }
     },
     computed: {
-        ...mapGetters(['currentUserId']),
+        currentUserId() {
+            return this.$store.getters.currentUserId;
+        },
         isUserAdmin() {
-            return this.$store.state.isAdmin;
+            return this.$store.getters.isUserAdmin;
         }
     },
     methods: {
@@ -63,7 +65,7 @@ export default {
             return new Intl.DateTimeFormat('fr-FR', {day:'2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'}).format(d)
         },
         showModifyButtons(postUserId) { //vérifie si l'utilisateur est le créateur du post ou un administrateur
-            if (postUserId == this.currentUserId || this.isUserAdmin) {
+            if (postUserId === this.currentUserId || this.isUserAdmin === true) {
                 return true;
             } else {
                 return false;

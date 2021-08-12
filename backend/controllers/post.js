@@ -15,13 +15,6 @@ exports.getAllPosts = (req, res, next) => {
         .catch(error => res.status(400).json({ error }));
 };
 
-exports.getPagePosts = (req, res, next) => {
-    const postsPerPages = 10;
-    Post.findAll({ order: [['createdAt', 'DESC']], offset: postsPerPages * (req.params.page - 1), limit: postsPerPages })
-    .then(posts => res.status(200).json(posts))
-    .catch(error => res.status(400).json({ error }));
-}
-
 exports.getOnePost = (req, res, next) => {
     Post.findOne({
         where: { id: req.params.id },

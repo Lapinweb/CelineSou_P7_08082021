@@ -13,7 +13,7 @@
     </div>
 
     <!--Formulaire pour créer un nouveau commentaire-->
-    <div class="row mb-2">
+    <div v-if="post" class="row mb-2">
         <form>
             <!--Champs texte du commentaire à créer-->
             <div class="col-12 col-md-9">
@@ -139,8 +139,8 @@ export default {
             const d = new Date(date)
             return new Intl.DateTimeFormat('fr-FR', {day:'2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'}).format(d)
         },
-        showModifyButtons(componentUserId) {    //vérifie si l'utilisateur est le créateur du commentaire ou un administrateur
-            if (componentUserId == this.currentUserId || this.isUserAdmin) {
+        showModifyButtons(componentUserId) {    //vérifie si l'utilisateur est le créateur du post ou commentaire ou un administrateur
+            if (componentUserId == this.currentUserId || this.isUserAdmin === true) {
                 return true;
             } else {
                 return false;
@@ -157,11 +157,10 @@ export default {
             })
             .then(() => {
                 alert("Le post a été supprimé !");
-                this.$router.push('/posts');
+                this.$router.push({name: 'AllPosts'});
             })
-            .catch((error) => {
+            .catch(() => {
                 alert("Une erreur est survenue !");
-                console.log(error);
             })
         },
         //fonction envoyer un commentaire
@@ -180,9 +179,8 @@ export default {
                 alert("Le commentaire a été posté !");
                 this.$router.go();
             })
-            .catch(error => {
-                alert("Une erreur est survenue ! Veuillez réessayer !")
-                console.log(error)
+            .catch(() => {
+                alert("Une erreur est survenue ! Veuillez réessayer !");
             })
         },
         //fonction supprimer un commentaire
@@ -218,8 +216,7 @@ export default {
                 alert("Le commentaire a été modifié !");
                 this.$router.go();
             })
-            .catch((error) => {
-                console.log(error);
+            .catch(() => {
                 alert("Une erreur est survenue !");
             })
         },
@@ -251,10 +248,8 @@ export default {
             .then(axios.spread((post, comments) => {
                 this.post = post.data;
                 this.comments = comments.data;
-                console.log(this.post);
-                console.log(this.comments);
             }))
-            .catch(error => console.log(error));
+            .catch(() => alert("Le post n'a pas pu être chargé !"));
 
     }
 }

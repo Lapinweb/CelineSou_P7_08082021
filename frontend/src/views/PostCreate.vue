@@ -32,7 +32,7 @@
                             <label for="image" class="form-label fs-4">Ajouter une image (format png, jpg et jpeg) :</label>
                         </div>
                         <div class="col-12 col-md-6 mb-3">
-                            <input @change="onFileSelected" class="form-control" type="file" accept="image/png, image/jpeg, image/jpg" id="image">
+                            <input @change="onFileSelected" ref="inputImage" class="form-control" type="file" accept="image/png, image/jpeg, image/jpg" id="image">
                         </div>
                         
                         <!--Bouton pour envoyer le post-->
@@ -86,6 +86,7 @@ export default {
         },
         deleteImage() { //retire l'image en cliquant sur le bouton
             this.previewImage = undefined;
+            this.selectedImage = undefined;
             this.$refs.inputImage.value = null;
         },
         //fonction publier un post

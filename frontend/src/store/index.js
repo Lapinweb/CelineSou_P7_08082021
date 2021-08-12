@@ -15,6 +15,12 @@ const store = createStore({
             return parseInt(state.userId);
         },
         isUserAdmin: (state) => {   //vérifie si l'utilisateur est administrateur
+            if (state.isAdmin === "true") {  //si les valeurs sont des strings (localStorage), elles sont reconverties en booleans
+                return true;
+            }
+            if (state.isAdmin === "false") {
+                return false;
+            }
             return state.isAdmin;
         }
     },

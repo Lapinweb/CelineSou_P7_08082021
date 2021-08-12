@@ -53,7 +53,7 @@
                 <!--Bouton "Envoyer"-->
                 <div class="row my-3">
                     <div class="col">
-                        <button type="submit" class="btn btn-info text-white" @click.prevent="signIn" :disabled="disableButton">
+                        <button type="submit" class="btn btn-info" @click.prevent="signIn" :disabled="disableButton">
                             Envoyer
                         </button> 
                     </div>  

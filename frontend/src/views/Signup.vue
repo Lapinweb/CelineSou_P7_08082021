@@ -34,7 +34,7 @@
                         <span class="text-danger">*</span>
                     </label>
 
-                    <input required v-model="password" type="text" name="password" id="password" class="form-control" :class="classPassword">
+                    <input required v-model="password" type="password" name="password" id="password" class="form-control" :class="classPassword">
                 
                     <!--Message si mot de passe invalide-->
                     <div v-if="showPasswordMessage === true" class="mt-1 text-end">

@@ -57,8 +57,7 @@ export default {
                 alert("Le compte a été supprimé.")
                 this.$router.push({path: "/login"});    //renvoie à la page 'login'
             })
-            .catch((res) => {
-                console.log(res);
+            .catch(() => {
                 alert("La suppression du compte a échouée.")
             })
         }

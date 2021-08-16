@@ -1,5 +1,7 @@
 require('dotenv').config();
 const User = require('../models/user');
+const Post = require('../models/post');
+const Comment = require('../models/comment');
 
 const bcrypt = require('bcrypt');
 const cryptoJS = require('crypto-js');
@@ -57,11 +59,19 @@ exports.deleteAccount = (req, res, next) => {
     User.findByPk(req.params.id)
         .then(user => {
             //vérifie si l'id correspond à l'id du token stocké dans req.id ou si l'utilisateur est administrateur
-            if (user.id !== req.user.id && req.user.isAdmin == false) {
+            if (user.id !== req.user.id) {
                 return res.status(403).json({ error: "Seul le propriétaire du compte peut le supprimer !"})
             } else {  //supprime l'utilisateur
-                User.destroy({ where: { id: req.params.id }} )
-                    .then(() => res.status(200).json({ message: 'Utilisateur supprimé !' }))
+                Comment.destroy({where: {userId: req.params.id}})   //supprime d'abord les commentaires de l'utilisateurs...
+                    .then(() => {
+                        Post.destroy({where: {userId: req.params.id}})  //...puis les posts
+                            .then(() => {
+                                User.destroy({ where: { id: req.params.id }} )
+                                    .then(() => res.status(200).json({ message: 'Utilisateur supprimé !' }))
+                                    .catch(error => res.status(400).json({ error }));                                
+                            })
+                            .catch(error => res.status(400).json({ error }));
+                    })
                     .catch(error => res.status(400).json({ error }));
             }
         })

@@ -43,7 +43,7 @@
                 :linkToPost="false"
                 :showCommentButton="false"
                 @clickDeleteComment="deleteComment(comment.id)"
-                @clickUpdateInput="updateCommentInput(comment.content)"
+                @clickUpdateInput="updateCommentInput(comment.content, comment.id)"
             ></Comment>
 
             <!--Modal qui s'affiche pour modifier un commentaire-->
@@ -65,7 +65,7 @@
                                 </div>
 
                                 <div class="col-12 mt-2 mb-3 text-end">
-                                    <button @click.prevent="modifyComment(comment.id)" :disabled="disableModifyComment" class="btn btn-info shadow">Envoyer</button>
+                                    <button @click.prevent="modifyComment(modifiedCommentId)" :disabled="disableModifyComment" class="btn btn-info shadow">Envoyer</button>
                                 </div>
                             </form>
                         </div>
@@ -97,7 +97,8 @@ export default {
             post: null,
             comments: null,
             content: "",    //contenu du nouveau commentaire
-            modifiedContent: "" //contenu du commentaire modifié
+            modifiedContent: "", //contenu du commentaire modifié
+            modifiedCommentId: null //id du commentaire modifié
         }
     },
     computed: {
@@ -220,9 +221,10 @@ export default {
                 alert("Une erreur est survenue !");
             })
         },
-        //en appuyant sur le bouton pour modifier un commentaire, modifie la valeur dans l'input
-        updateCommentInput(commentContent) {
+        //en appuyant sur le bouton pour modifier un commentaire, modifie la valeur dans l'input et l'id du commentaire modifié
+        updateCommentInput(commentContent, commentId) {
             this.modifiedContent = commentContent;
+            this.modifiedCommentId = commentId;
         }
     },
     created() {

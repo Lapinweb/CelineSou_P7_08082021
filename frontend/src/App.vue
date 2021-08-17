@@ -8,18 +8,18 @@
                 </router-link>
 
                 <!--Boutons de barre de navigation-->
-                <button v-if="isLoggedIn === true" class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+                <button v-if="isLoggedIn === true" class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-label="Toggle navigation">>
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
                 <!--Les boutons Profile et Déconnexion n'apparaissent que si l'utilisateur est connecté-->
                 <div v-if="isLoggedIn == true" id="navbarContent" class="collapse navbar-collapse justify-content-end">
                     <ul class="navbar-nav d-flex align-items-center">
-                        <li class="nav-item">
+                        <li class="nav-item fs-5">
                             <router-link :to="{name: 'Profile', params: {id: currentUserId}}" class="nav-link text-white">Profile</router-link>
                         </li>
                         <li class="nav-item">
-                            <button @click="logOut" class="nav-link btn text-white">Déconnexion</button>
+                            <button @click="logOut" class="nav-link btn text-white fs-5">Déconnexion</button>
                         </li>
                     </ul>
                 </div>

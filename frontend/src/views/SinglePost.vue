@@ -1,4 +1,7 @@
 <template>
+    <div class="row mb-2">
+        <h1>Post et commentaires</h1>
+    </div>
     <!--Affiche un post-->
     <div v-if="post" class="row mb-3"><!--Affiche seulment si le post a été récupéré-->
         <Post
@@ -17,7 +20,8 @@
         <form>
             <!--Champs texte du commentaire à créer-->
             <div class="col-12 col-md-9">
-                <textarea v-model="content" class="form-control border border-secondary textarea-height shadow" placeholder="Ajouter un commentaire" rows="4"></textarea>
+                <label for="newComment" class="form-label">Ajouter un commentaire</label>
+                <textarea v-model="content" id="newComment" class="form-control border border-secondary textarea-height shadow" rows="4"></textarea>
             </div>
 
             <!--Bouton pour envoyer le commentaire-->

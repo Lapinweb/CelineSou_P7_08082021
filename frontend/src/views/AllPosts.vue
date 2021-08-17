@@ -1,11 +1,15 @@
 <template>
+    <div class="row">
+        <h1>Derniers posts</h1>
+    </div>
+
     <div class="row py-3 mb-5 d-flex justify-content-between align-items-center">
         <div class="col-12 col-sm-6">               
         </div>
 
         <!--Bouton pour créer un nouveau post-->
         <div class="col-12 col-sm-6 text-end mt-2 mt-sm-0">
-            <router-link to="/newpost" class="btn btn-info text-white fs-5">
+            <router-link to="/newpost" class="btn btn-info fs-5">
                 Nouveau post
                 <i class="fas fa-pen"></i>
             </router-link>

@@ -54,6 +54,7 @@ export default {
             })
             .then(() => {
                 localStorage.clear();
+                this.$store.dispatch('logOut');
                 alert("Le compte a été supprimé.")
                 this.$router.push({path: "/login"});    //renvoie à la page 'login'
             })
